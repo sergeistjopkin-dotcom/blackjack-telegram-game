@@ -11,12 +11,8 @@ html,body{width:100%;height:100%;overflow-y:auto;position:fixed;top:0;left:0}
 body{background:#0a1a0a;font-family:Georgia,serif;color:#fff;min-height:100dvh;width:100vw}
 .screen{display:none;min-height:100dvh;width:100vw;flex-direction:column}
 .screen.active{display:flex}
-
-/* Статус бар */
 #status-bar{position:fixed;top:0;left:0;right:0;z-index:9999;padding:5px;text-align:center;font-size:.6rem;letter-spacing:1px;background:rgba(0,0,0,.9)}
 #status-bar.online{background:#27ae60}#status-bar.offline{background:#e74c3c}
-
-/* Главный экран */
 #home-screen{background:radial-gradient(ellipse at 50% 25%,#1e7a38 0%,#0b3318 65%);align-items:center;justify-content:center;padding:50px 15px 20px;gap:12px}
 .logo{text-align:center}
 .logo h1{font-size:1.7rem;color:#d4af37;letter-spacing:4px;text-shadow:0 2px 10px rgba(0,0,0,.6)}
@@ -27,28 +23,21 @@ body{background:#0a1a0a;font-family:Georgia,serif;color:#fff;min-height:100dvh;w
 .inp:focus{border-color:#d4af37}.inp::placeholder{color:rgba(255,255,255,.3)}
 .btn-gold{padding:13px;background:linear-gradient(135deg,#b8891e,#e8c93a);color:#000;border:none;border-radius:12px;font-size:.85rem;font-weight:bold;cursor:pointer;letter-spacing:2px;width:100%;box-shadow:0 4px 20px rgba(212,175,55,.3);transition:all .15s;font-family:Georgia,serif}
 .btn-gold:active{transform:scale(.97)}.btn-gold:disabled{opacity:.4}
-
-/* Игровой стол */
 #game-screen{background:radial-gradient(ellipse at 50% -10%,#1a6b30 0%,#0b3318 100%);padding:30px 10px 10px}
 .dealer-area{text-align:center;padding:10px;background:rgba(0,0,0,.2);border-radius:12px;margin-bottom:8px;position:relative}
 .dealer-label{font-size:.55rem;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,.4)}
 .dealer-cards{display:flex;gap:4px;justify-content:center;flex-wrap:wrap;min-height:65px;align-items:center;margin:5px 0}
 .dealer-value{font-size:.9rem;font-weight:bold;color:#d4af37;min-height:22px}
 .deck-pile{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:40px;height:56px;background:linear-gradient(135deg,#1a237e,#0d47a1);border-radius:5px;border:2px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:rgba(255,255,255,.5)}
-
 .player-area{text-align:center;padding:12px;background:rgba(0,0,0,.3);border-radius:12px;border:2px solid rgba(212,175,55,.3);margin-bottom:8px}
 .player-name-tag{font-size:.75rem;font-weight:bold;color:#d4af37;margin-bottom:3px}
 .player-balance{font-size:.6rem;color:#4caf50;margin-bottom:3px}
 .player-cards{display:flex;gap:4px;justify-content:center;flex-wrap:wrap;min-height:65px;align-items:center;margin:5px 0}
 .player-value{font-size:.9rem;font-weight:bold;color:#fff;min-height:22px}
 .bet-display{font-size:.65rem;color:rgba(255,255,255,.5);margin-top:2px}
-
-/* Достижения */
 .achievement-popup{position:fixed;top:20%;left:50%;transform:translate(-50%,-50%);background:linear-gradient(135deg,#1a0a00,#2a1506);border:2px solid #d4af37;border-radius:16px;padding:20px;text-align:center;z-index:9998;animation:achPop .3s ease,achFade 2s 2s forwards;pointer-events:none}
 @keyframes achPop{from{opacity:0;transform:translate(-50%,-50%) scale(.5)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
 @keyframes achFade{to{opacity:0;transform:translate(-50%,-50%) translateY(-20px)}}
-
-/* Карты */
 .card{width:48px;height:68px;background:#fff;border-radius:5px;display:flex;flex-direction:column;justify-content:space-between;padding:2px 3px;box-shadow:0 2px 6px rgba(0,0,0,.4);font-weight:bold;flex-shrink:0;animation:dealCard .35s cubic-bezier(.25,.46,.45,.94)}
 .card.r{color:#c0392b}.card.b{color:#1a1a1a}
 .card .ct{font-size:.6rem;line-height:1;text-align:left}
@@ -58,8 +47,6 @@ body{background:#0a1a0a;font-family:Georgia,serif;color:#fff;min-height:100dvh;w
 .card.fly{animation:flyFromDeck .4s ease-out}
 @keyframes dealCard{from{opacity:0;transform:translateY(-15px) scale(.85)}to{opacity:1;transform:none}}
 @keyframes flyFromDeck{0%{opacity:0;transform:translate(80px,-30px) rotate(-15deg) scale(.6)}60%{opacity:1}100%{opacity:1;transform:translate(0,0) rotate(0) scale(1)}}
-
-/* Действия */
 .actions{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:8px}
 .btn-act{padding:10px 5px;border:none;border-radius:8px;font-size:.7rem;font-weight:bold;cursor:pointer;letter-spacing:1px;text-transform:uppercase;font-family:Georgia,serif;transition:all .12s}
 .btn-act:active{transform:scale(.94)}.btn-act:disabled{opacity:.3}
@@ -67,21 +54,14 @@ body{background:#0a1a0a;font-family:Georgia,serif;color:#fff;min-height:100dvh;w
 .btn-double{background:#2980b9;color:#fff}.btn-split{background:#8e44ad;color:#fff}
 .btn-insurance{background:#e67e22;color:#fff}
 .btn-surrender{background:rgba(255,255,255,.15);color:#fff;grid-column:1/-1;font-size:.65rem}
-
-/* Чипы */
 .chips-row{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;margin:6px 0}
 .chip{width:40px;height:40px;border-radius:50%;border:3px solid rgba(255,255,255,.3);font-size:.6rem;font-weight:bold;color:#fff;cursor:pointer;transition:all .12s;background:none;display:flex;align-items:center;justify-content:center}
 .chip:active{transform:scale(.9)}.chip.sel{border-color:#d4af37;box-shadow:0 0 12px rgba(212,175,55,.5);transform:scale(1.1)}
-
-/* Секции */
 .section-title{font-size:.65rem;color:#d4af37;text-align:center;letter-spacing:1px;margin:8px 0}
 .stat-row{display:flex;justify-content:space-between;padding:5px 10px;font-size:.7rem;color:rgba(255,255,255,.7)}
 .leaderboard-item{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:rgba(255,255,255,.03);border-radius:8px;margin:3px 0;font-size:.7rem}
 .medal{font-size:1rem;margin-right:5px}
-
 .msg-banner{text-align:center;padding:7px;background:rgba(0,0,0,.5);border-radius:20px;font-size:.65rem;color:#d4af37;margin:6px 0}
-
-/* Квиз */
 #quiz-screen{background:radial-gradient(ellipse at 50% 25%,#1e7a38 0%,#0b3318 65%);align-items:center;justify-content:center;padding:20px}
 .quiz-card{background:rgba(0,0,0,.4);border:2px solid #d4af37;border-radius:16px;padding:22px;width:100%;max-width:380px;text-align:center}
 .quiz-q{font-size:1rem;color:#d4af37;margin-bottom:18px;line-height:1.4}
@@ -92,29 +72,21 @@ body{background:#0a1a0a;font-family:Georgia,serif;color:#fff;min-height:100dvh;w
 .quiz-difficulty{font-size:.55rem;padding:2px 8px;border-radius:10px;display:inline-block;margin-bottom:8px}
 .diff-easy{background:rgba(39,174,96,.2);color:#27ae60}
 .diff-hard{background:rgba(231,76,60,.2);color:#e74c3c}
-
 .btn-back{padding:10px;background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:8px;font-size:.75rem;cursor:pointer;width:100%;margin-top:6px;font-family:Georgia,serif}
-
-/* Табы */
+.btn-share{padding:10px;background:rgba(33,150,243,.15);color:#2196f3;border:1px solid #2196f3;border-radius:8px;font-size:.8rem;cursor:pointer;width:100%;font-family:Georgia,serif;margin-top:5px}
+.room-box{text-align:center;padding:12px;background:rgba(0,0,0,.3);border-radius:12px;margin-bottom:8px}
+.room-code{font-size:2rem;color:#d4af37;font-weight:bold;letter-spacing:4px}
+.room-players{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin:8px 0}
+.player-tag{background:rgba(212,175,55,.15);color:#d4af37;padding:5px 12px;border-radius:15px;font-size:.75rem;border:1px solid rgba(212,175,55,.3)}
+.player-tag.me{background:rgba(212,175,55,.3);font-weight:bold}
+.waiting-text{color:rgba(255,255,255,.5);font-size:.7rem;font-style:italic}
 .tabs{display:flex;gap:4px;margin:8px 0}
 .tab-btn{flex:1;padding:8px;background:rgba(255,255,255,.05);color:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.1);border-radius:8px;font-size:.65rem;cursor:pointer;font-family:Georgia,serif;text-align:center;transition:all .2s}
 .tab-btn.active{background:rgba(212,175,55,.2);color:#d4af37;border-color:#d4af37}
-
-/* Toast */
 .toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.9);color:#fff;padding:12px 25px;border-radius:25px;font-size:.8rem;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none}
 .toast.show{opacity:1}
-  
- .toast.show{opacity:1}
-
-/* Улучшенная анимация карт */
 .card{transition:transform 0.3s ease,opacity 0.3s ease}
 .card:hover{transform:translateY(-3px);box-shadow:0 6px 15px rgba(0,0,0,.6)}
-.card.fly{animation:flyFromDeck .4s cubic-bezier(.25,.46,.45,.94)}
-@keyframes flyFromDeck{
-0%{opacity:0;transform:translate(100px,-40px) rotate(-20deg) scale(.5)}
-50%{opacity:1;transform:translate(20px,-10px) rotate(-5deg) scale(1.05)}
-100%{opacity:1;transform:translate(0,0) rotate(0) scale(1)}
-}
 .deck-pile{transition:transform .2s ease;cursor:pointer}
 .deck-pile:active{transform:translateY(-50%) scale(.9)}
 .chip{transition:all .2s ease}
@@ -124,53 +96,31 @@ body{background:#0a1a0a;font-family:Georgia,serif;color:#fff;min-height:100dvh;w
 .msg-banner{animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.7}}
 </style>
-</style>
 </head>
 <body>
-  <div id="status-bar" class="offline">🔴 ПОДКЛЮЧЕНИЕ...</div>
+<div id="status-bar" class="offline">🔴 ПОДКЛЮЧЕНИЕ...</div>
 <div class="toast" id="toast"></div>
 
-<!-- ГЛАВНЫЙ ЭКРАН -->
 <div id="home-screen" class="screen active">
-  <div class="logo">
-    <h1>♠ BLACKJACK 21 ♠</h1>
-    <div class="sub">PREMIUM CASINO • TELEGRAM</div>
-  </div>
-  
+  <div class="logo"><h1>♠ BLACKJACK 21 ♠</h1><div class="sub">PREMIUM CASINO • TELEGRAM</div></div>
   <div class="card-box" id="homeContent" style="display:none;">
-    <!-- Табы -->
     <div class="tabs">
       <button class="tab-btn active" onclick="switchTab('play')">🎮 Игра</button>
       <button class="tab-btn" onclick="switchTab('leaderboard')">🏆 Топ</button>
       <button class="tab-btn" onclick="switchTab('achievements')">🎖️ Ачивки</button>
     </div>
-    
-    <!-- Вкладка Игра -->
     <div id="tab-play">
       <div class="lbl">👤 ИМЯ</div>
       <input id="playerName" class="inp" placeholder="Ваше имя" maxlength="12">
       <button class="btn-gold" onclick="startSoloGame()">🤖 ИГРАТЬ ОДНОМУ</button>
       <div style="text-align:center;color:rgba(255,255,255,.2);font-size:.6rem;margin:4px 0;">— или с друзьями —</div>
-      <input id="roomCode" class="inp" placeholder="Код комнаты" maxlength="10" style="text-transform:uppercase">
+      <input id="roomCode" class="inp" placeholder="Код комнаты (пусто=новая)" maxlength="10" style="text-transform:uppercase">
       <button class="btn-gold" onclick="joinMultiGame()">👥 ИГРАТЬ С ДРУЗЬЯМИ</button>
       <button class="btn-gold" onclick="claimDaily()" style="margin-top:5px;background:linear-gradient(135deg,#e67e22,#f39c12);">🎁 ЕЖЕДНЕВНЫЙ БОНУС</button>
     </div>
-    
-    <!-- Вкладка Лидеры -->
-    <div id="tab-leaderboard" style="display:none;">
-      <div class="section-title">🏆 ТОП-10 ИГРОКОВ</div>
-      <div id="leaderboardList"></div>
-    </div>
-    
-    <!-- Вкладка Достижения -->
-    <div id="tab-achievements" style="display:none;">
-      <div class="section-title">🎖️ ДОСТИЖЕНИЯ</div>
-      <div id="achievementsList"></div>
-    </div>
-    
-    <!-- Статистика -->
-    <div id="playerStats" style="display:none;">
-      <div class="section-title">📊 СТАТИСТИКА</div>
+    <div id="tab-leaderboard" style="display:none;"><div class="section-title">🏆 ТОП-10 ИГРОКОВ</div><div id="leaderboardList"></div></div>
+    <div id="tab-achievements" style="display:none;"><div class="section-title">🎖️ ДОСТИЖЕНИЯ</div><div id="achievementsList"></div></div>
+    <div id="playerStats" style="display:none;"><div class="section-title">📊 СТАТИСТИКА</div>
       <div class="stat-row"><span>Побед</span><span id="statWins">0</span></div>
       <div class="stat-row"><span>Поражений</span><span id="statLosses">0</span></div>
       <div class="stat-row"><span>Блэкджеков</span><span id="statBJ">0</span></div>
@@ -179,757 +129,121 @@ body{background:#0a1a0a;font-family:Georgia,serif;color:#fff;min-height:100dvh;w
   </div>
 </div>
 
-<!-- ИГРОВОЙ СТОЛ -->
 <div id="game-screen" class="screen">
-  <div class="dealer-area">
-    <div class="dealer-label">👔 ДИЛЕР</div>
-    <div class="deck-pile" id="deckPile">🃏</div>
-    <div class="dealer-cards" id="dealerCards"></div>
-    <div class="dealer-value" id="dealerValue"></div>
-  </div>
+  <div class="dealer-area"><div class="dealer-label">👔 ДИЛЕР</div><div class="deck-pile" id="deckPile">🃏</div><div class="dealer-cards" id="dealerCards"></div><div class="dealer-value" id="dealerValue"></div></div>
   <div class="msg-banner" id="gameMsg">🎲 Делайте ставку!</div>
-  <div class="player-area" id="playerArea">
-    <div class="player-name-tag" id="playerNameDisplay">Игрок</div>
-    <div class="player-balance" id="playerBalance">💰 1000</div>
-    <div class="player-cards" id="playerCards"></div>
-    <div class="player-value" id="playerValue"></div>
-    <div class="bet-display" id="betDisplay"></div>
-    <div class="chips-row" id="chipsRow"></div>
-    <div class="actions" id="actionsRow"></div>
-  </div>
-  <button class="btn-back" onclick="goHome()">🔙 ВЫЙТИ (игра сохранится)</button>
+  <div class="player-area" id="playerArea"><div class="player-name-tag" id="playerNameDisplay">Игрок</div><div class="player-balance" id="playerBalance">💰 1000</div><div class="player-cards" id="playerCards"></div><div class="player-value" id="playerValue"></div><div class="bet-display" id="betDisplay"></div><div class="chips-row" id="chipsRow"></div><div class="actions" id="actionsRow"></div></div>
+  <button class="btn-back" onclick="goHome()">🔙 ВЫЙТИ</button>
 </div>
 
-<!-- КВИЗ -->
 <div id="quiz-screen" class="screen">
-  <div class="quiz-card">
-    <div style="font-size:1.3rem;color:#d4af37;margin-bottom:6px;">🛡️ ПРОВЕРКА</div>
-    <div class="quiz-difficulty" id="quizDiff">ЛЁГКИЙ</div>
-    <div class="quiz-progress" id="quizProgress">ВОПРОС 1 ИЗ 3</div>
-    <div class="quiz-q" id="quizQuestion"></div>
-    <div class="quiz-answers" id="quizAnswers"></div>
-  </div>
+  <div class="quiz-card"><div style="font-size:1.3rem;color:#d4af37;margin-bottom:6px;">🛡️ ПРОВЕРКА</div><div class="quiz-difficulty" id="quizDiff">ЛЁГКИЙ</div><div class="quiz-progress" id="quizProgress">ВОПРОС 1 ИЗ 3</div><div class="quiz-q" id="quizQuestion"></div><div class="quiz-answers" id="quizAnswers"></div></div>
 </div>
+
 <script>
-// ═══════════════════ КОНФИГ ═══════════════════
-const API_URL = 'https://blackjack-server-x391.onrender.com/api/player';
-let tgUser = null;
-let myUserId = localStorage.getItem('bj_userId');
-if (!myUserId) {
-  myUserId = 'user_' + Math.random().toString(36).substring(2, 10);
-  localStorage.setItem('bj_userId', myUserId);
-}
-// ═══════════════════ TELEGRAM ═══════════════════
-function initTG() {
-  if (!window.Telegram?.WebApp) return;
-  const tg = window.Telegram.WebApp;
-  tg.ready(); tg.expand();
-  if (tg.initDataUnsafe?.user) {
-    tgUser = tg.initDataUnsafe.user;
-    myUserId = tgUser.id.toString();
-    document.getElementById('playerName').value = tgUser.first_name || '';
-  }
+const API_URL='https://blackjack-server-x391.onrender.com/api/player';
+const WS_URL='wss://blackjack-server-x391.onrender.com';
+let tgUser=null;
+let myUserId=localStorage.getItem('bj_userId');
+if(!myUserId){myUserId='user_'+Math.random().toString(36).substring(2,10);localStorage.setItem('bj_userId',myUserId);}
+let multiWS=null,multiRoom=null;
+
+function initTG(){if(!window.Telegram?.WebApp)return;const tg=window.Telegram.WebApp;tg.ready();tg.expand();if(tg.initDataUnsafe?.user){tgUser=tg.initDataUnsafe.user;myUserId=tgUser.id.toString();document.getElementById('playerName').value=tgUser.first_name||'';}}
+
+async function api(action,data={}){try{console.log('API:',action,myUserId);const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,userId:myUserId,data})});const result=await res.json();console.log('API ответ:',result);return result;}catch(e){console.error('API ошибка:',e.message);return null;}}
+
+const ACHIEVEMENTS={first_win:{name:'🎉 Первая победа',desc:'Выиграть первую игру',icon:'🏆'},five_wins:{name:'🔥 Победная серия',desc:'Выиграть 5 раз',icon:'🔥'},ten_wins:{name:'💎 Мастер',desc:'Выиграть 10 раз',icon:'💎'},blackjack:{name:'⭐ Блэкджек!',desc:'Собрать 21',icon:'⭐'},high_roller:{name:'💰 Хайроллер',desc:'Ставка 100+',icon:'💰'},comeback:{name:'🔄 Камбэк',desc:'Выиграть после проигрыша',icon:'🔄'},double_down:{name:'⚡ Дабл',desc:'Успешный Double Down',icon:'⚡'},insurance_win:{name:'🛡️ Страховка',desc:'Выиграть страховку',icon:'🛡️'},balance_5000:{name:'🏦 Банкир',desc:'5000 фишек',icon:'🏦'},daily_3:{name:'📅 Завсегдатай',desc:'3 дня подряд',icon:'📅'}};
+
+function showAchievement(key){if(!ACHIEVEMENTS[key])return;const a=ACHIEVEMENTS[key];const div=document.createElement('div');div.className='achievement-popup';div.innerHTML=`<div style="font-size:2rem">${a.icon}</div><div style="color:#d4af37;font-weight:bold;margin:8px 0">${a.name}</div><div style="font-size:.7rem;color:rgba(255,255,255,.7)">${a.desc}</div>`;document.body.appendChild(div);setTimeout(()=>div.remove(),2500);}
+
+async function loadAchievements(){const p=await api('get');if(!p||!p.achievements)return;let html='';for(let key in ACHIEVEMENTS){const a=ACHIEVEMENTS[key];const unlocked=p.achievements.includes(key);html+=`<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;font-size:.7rem;opacity:${unlocked?'1':'.4'}"><span style="font-size:1.2rem">${unlocked?'✅':'🔒'}</span><span>${a.icon} <b>${a.name}</b><br><span style="font-size:.6rem;color:rgba(255,255,255,.5)">${a.desc}</span></span></div>`;}document.getElementById('achievementsList').innerHTML=html;}
+
+async function loadLeaderboard(){const lb=await api('leaderboard');if(!lb||!lb.length){document.getElementById('leaderboardList').innerHTML='<div style="text-align:center;color:rgba(255,255,255,.4);padding:20px;">Пока нет игроков</div>';return;}let html='';lb.forEach((p,i)=>{const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':`${i+1}.`;html+=`<div class="leaderboard-item"><span><span class="medal">${medal}</span> ${p.username}</span><span>🏆${p.wins} 🪙${p.balance}</span></div>`;});document.getElementById('leaderboardList').innerHTML=html;}
+
+async function loadStats(){const p=await api('get');if(!p)return;document.getElementById('statWins').textContent=p.wins||0;document.getElementById('statLosses').textContent=p.losses||0;document.getElementById('statBJ').textContent=p.blackjacks||0;document.getElementById('statStreak').textContent=p.loginStreak||0;document.getElementById('playerStats').style.display='block';}
+
+async function claimDaily(){const result=await api('daily');if(result.ok){toast(`🎁 +${result.bonus} фишек! Серия: ${result.streak} дн.`);if(result.streak>=3)showAchievement('daily_3');}else{toast(`⏰ Бонус через ${result.hoursLeft} ч.`);}}
+
+function switchTab(tab){document.getElementById('tab-play').style.display='none';document.getElementById('tab-leaderboard').style.display='none';document.getElementById('tab-achievements').style.display='none';document.getElementById('tab-'+tab).style.display='block';const buttons=document.querySelectorAll('.tab-btn');buttons[0].classList.remove('active');buttons[1].classList.remove('active');buttons[2].classList.remove('active');if(tab==='play')buttons[0].classList.add('active');if(tab==='leaderboard')buttons[1].classList.add('active');if(tab==='achievements')buttons[2].classList.add('active');if(tab==='leaderboard')loadLeaderboard();if(tab==='achievements'){loadAchievements();loadStats();}}
+
+let game={deck:[],playerHand:[],dealerHand:[],dealerHole:null,balance:1000,bet:0,phase:'betting',playerName:'Игрок',lastResult:null,insuranceBet:0};
+
+function newDeck(){const S=['♠','♥','♦','♣'],V=['A','2','3','4','5','6','7','8','9','10','J','Q','K'];let d=[];for(let i=0;i<6;i++)for(let s of S)for(let v of V)d.push({v,s});for(let i=d.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[d[i],d[j]]=[d[j],d[i]];}return d;}
+function draw(){if(game.deck.length<52)game.deck=newDeck();return game.deck.pop();}
+function cv(c){if(!c||c.fd)return 0;if(c.v==='A')return 11;if(['J','Q','K'].includes(c.v))return 10;return parseInt(c.v);}
+function hv(cards){let v=0,a=0;for(let c of cards){if(!c||c.fd)continue;if(c.v==='A'){a++;v+=11}else if(['J','Q','K'].includes(c.v))v+=10;else v+=parseInt(c.v);}while(v>21&&a>0){v-=10;a--;}return v;}
+function isBJ(cards){return cards.length===2&&hv(cards)===21;}
+
+function cardHTML(c,fd=false,fly=false){if(fd||!c)return`<div class="card fd${fly?' fly':''}"></div>`;const red=c.s==='♥'||c.s==='♦';return`<div class="card ${red?'r':'b'}${fly?' fly':''}"><div class="ct">${c.v}<br>${c.s}</div><div class="cm">${c.s}</div><div class="cb">${c.v}</div></div>`;}
+
+function renderGame(){
+  let dcHTML='';game.dealerHand.forEach(c=>dcHTML+=cardHTML(c));
+  if(game.dealerHole&&game.phase!=='dealer'&&game.phase!=='result')dcHTML+=cardHTML(null,true);
+  else if(game.dealerHole)dcHTML+=cardHTML(game.dealerHole);
+  document.getElementById('dealerCards').innerHTML=dcHTML||'<span style="color:rgba(255,255,255,.3);font-size:.7rem;">Пусто</span>';
+  const dv=game.phase==='dealer'||game.phase==='result'?hv([...game.dealerHand,...(game.dealerHole?[game.dealerHole]:[])]):(game.dealerHand[0]?cv(game.dealerHand[0]):0);
+  document.getElementById('dealerValue').textContent=game.phase==='betting'?'':(game.phase==='dealer'||game.phase==='result'?dv:(dv+' + ?'));
+  document.getElementById('deckPile').textContent=game.deck.length>0?'🃏':'🔄';
+  document.getElementById('playerCards').innerHTML=game.playerHand.map(c=>cardHTML(c)).join('')||'<span style="color:rgba(255,255,255,.3);font-size:.7rem;">Пусто</span>';
+  const pv=hv(game.playerHand);
+  document.getElementById('playerValue').textContent=game.playerHand.length?pv+(pv>21?' 💥':isBJ(game.playerHand)?' ⭐':''):'';
+  document.getElementById('playerBalance').textContent='💰 '+game.balance;
+  document.getElementById('playerNameDisplay').textContent=game.playerName;
+  document.getElementById('betDisplay').textContent=game.bet?'🎲 Ставка: '+game.bet:(game.insuranceBet?'🛡️ Страховка: '+game.insuranceBet:'');
+  const act=document.getElementById('actionsRow');const chips=document.getElementById('chipsRow');
+  if(game.phase==='betting'){chips.innerHTML=[5,10,25,50,100].map(v=>`<button class="chip" onclick="addBet(${v})">${v}</button>`).join('');chips.innerHTML+=`<button class="chip" onclick="clearBet()" style="background:rgba(255,255,255,.1);font-size:.5rem;">✕</button>`;act.innerHTML=`<button class="btn-act btn-gold" style="grid-column:1/-1" onclick="deal()">🎴 DEAL (${game.bet||0})</button>`;document.getElementById('gameMsg').textContent='🎲 Делайте ставку!';}
+  else if(game.phase==='insurance'){chips.innerHTML='';act.innerHTML=`<button class="btn-act btn-insurance" onclick="takeInsurance(true)">🛡️ Да (${Math.floor(game.bet/2)})</button><button class="btn-act btn-stand" onclick="takeInsurance(false)">✕ Нет</button>`;document.getElementById('gameMsg').textContent='🛡️ Страховка против туза?';}
+  else if(game.phase==='player'){chips.innerHTML='';const canSplit=game.playerHand.length===2&&cv(game.playerHand[0])===cv(game.playerHand[1])&&game.balance>=game.bet;const canDouble=game.playerHand.length===2&&game.balance>=game.bet;act.innerHTML=`<button class="btn-act btn-hit" onclick="hit()">Hit</button><button class="btn-act btn-stand" onclick="stand()">Stand</button><button class="btn-act btn-double" onclick="doubleDown()" ${!canDouble?'disabled':''}>Double</button><button class="btn-act btn-split" onclick="split()" ${!canSplit?'disabled':''}>Split</button><button class="btn-act btn-surrender" onclick="surrender()" ${game.playerHand.length!==2?'disabled':''}>Surrender</button>`;document.getElementById('gameMsg').textContent='🎯 Ваш ход';}
+  else if(game.phase==='dealer'){chips.innerHTML='';act.innerHTML='';document.getElementById('gameMsg').textContent='👔 Дилер играет...';}
+  else if(game.phase==='result'){chips.innerHTML='';act.innerHTML=`<button class="btn-act btn-gold" style="grid-column:1/-1" onclick="newRound()">🔄 Новый раунд</button>`;}
 }
 
-// ═══════════════════ API ═══════════════════
-async function api(action, data = {}) {
-  try {
-    console.log('API запрос:', action, myUserId);
-    const res = await fetch(API_URL, {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ action, userId: myUserId, data })
-    });
-    const result = await res.json();
-    console.log('API ответ:', result);
-    return result;
-  } catch(e) {
-    console.error('API ошибка:', e.message);
-    return null;
-  }
-}
+function addBet(v){if(game.phase!=='betting')return;if(game.bet+v<=game.balance){game.bet+=v;game.balance-=v;}renderGame();}
+function clearBet(){if(game.phase!=='betting')return;game.balance+=game.bet;game.bet=0;game.insuranceBet=0;renderGame();}
 
-// ═══════════════════ ДОСТИЖЕНИЯ ═══════════════════
-const ACHIEVEMENTS = {
-  first_win: {name:'🎉 Первая победа',desc:'Выиграть первую игру',icon:'🏆'},
-  five_wins: {name:'🔥 Победная серия',desc:'Выиграть 5 раз',icon:'🔥'},
-  ten_wins: {name:'💎 Мастер',desc:'Выиграть 10 раз',icon:'💎'},
-  blackjack: {name:'⭐ Блэкджек!',desc:'Собрать 21',icon:'⭐'},
-  high_roller: {name:'💰 Хайроллер',desc:'Ставка 100+',icon:'💰'},
-  comeback: {name:'🔄 Камбэк',desc:'Выиграть после проигрыша',icon:'🔄'},
-  double_down: {name:'⚡ Дабл',desc:'Успешный Double Down',icon:'⚡'},
-  insurance_win: {name:'🛡️ Страховка',desc:'Выиграть страховку',icon:'🛡️'},
-  balance_5000: {name:'🏦 Банкир',desc:'5000 фишек',icon:'🏦'},
-  daily_3: {name:'📅 Завсегдатай',desc:'3 дня подряд',icon:'📅'}
-};
+function deal(){if(game.bet<5)return toast('⚠️ Минимум 5 фишек');if(game.bet>=100)showAchievement('high_roller');game.deck=newDeck();game.phase='dealing';document.getElementById('gameMsg').textContent='🃏 Раздача карт...';let step=0;const seq=[];seq.push(()=>{game.playerHand=[draw()];renderGame();});seq.push(()=>{game.dealerHand=[draw()];renderGame();});seq.push(()=>{game.playerHand.push(draw());renderGame();});seq.push(()=>{game.dealerHole=draw();renderGame();});function next(){if(step<seq.length){seq[step]();step++;setTimeout(next,400);}else{if(game.dealerHand[0].v==='A'&&game.balance>=Math.floor(game.bet/2)){game.phase='insurance';}else{game.phase='player';if(hv(game.playerHand)===21)stand();}renderGame();}}next();}
 
-function showAchievement(key) {
-  if (!ACHIEVEMENTS[key]) return;
-  const a = ACHIEVEMENTS[key];
-  const div = document.createElement('div');
-  div.className = 'achievement-popup';
-  div.innerHTML = `<div style="font-size:2rem">${a.icon}</div><div style="color:#d4af37;font-weight:bold;margin:8px 0">${a.name}</div><div style="font-size:.7rem;color:rgba(255,255,255,.7)">${a.desc}</div>`;
-  document.body.appendChild(div);
-  setTimeout(() => div.remove(), 2500);
-}
+function takeInsurance(yes){if(yes){game.insuranceBet=Math.floor(game.bet/2);game.balance-=game.insuranceBet;}game.phase='player';if(hv(game.playerHand)===21)stand();renderGame();}
 
-async function loadAchievements() {
-  const p = await api('get');
-  if (!p || !p.achievements) return;
-  
-  let html = '';
-  for (let key in ACHIEVEMENTS) {
-    const a = ACHIEVEMENTS[key];
-    const unlocked = p.achievements.includes(key);
-    html += `<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;font-size:.7rem;opacity:${unlocked?'1':'.4'}">
-      <span style="font-size:1.2rem">${unlocked?'✅':'🔒'}</span>
-      <span>${a.icon} <b>${a.name}</b><br><span style="font-size:.6rem;color:rgba(255,255,255,.5)">${a.desc}</span></span>
-    </div>`;
-  }
-  document.getElementById('achievementsList').innerHTML = html;
-}
+function hit(){game.playerHand.push(draw());renderGame();const cards=document.querySelectorAll('#playerCards .card');if(cards.length>0){const lc=cards[cards.length-1];lc.classList.add('fly');lc.style.animation='none';lc.offsetHeight;lc.style.animation='flyFromDeck 0.4s ease-out';}if(hv(game.playerHand)>=21)setTimeout(()=>stand(),500);}
 
-async function loadLeaderboard() {
-  const lb = await api('leaderboard');
-  if (!lb || !lb.length) {
-    document.getElementById('leaderboardList').innerHTML = '<div style="text-align:center;color:rgba(255,255,255,.4);padding:20px;">Пока нет игроков</div>';
-    return;
-  }
-  let html = '';
-  lb.forEach((p, i) => {
-    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i+1}.`;
-    html += `<div class="leaderboard-item">
-      <span><span class="medal">${medal}</span> ${p.username}</span>
-      <span>🏆${p.wins} 🪙${p.balance}</span>
-    </div>`;
-  });
-  document.getElementById('leaderboardList').innerHTML = html;
-}
+function stand(){game.phase='dealer';renderGame();game.dealerHand.push(game.dealerHole);game.dealerHole=null;setTimeout(()=>{renderGame();const dc=document.querySelectorAll('#dealerCards .card');if(dc.length>0){const hc=dc[dc.length-1];if(hc){hc.style.animation='flyFromDeck 0.5s ease-out';}}},300);setTimeout(()=>{while(hv(game.dealerHand)<17){game.dealerHand.push(draw());renderGame();}endRound();},1000);}
 
-async function loadStats() {
-  const p = await api('get');
-  if (!p) return;
-  document.getElementById('statWins').textContent = p.wins || 0;
-  document.getElementById('statLosses').textContent = p.losses || 0;
-  document.getElementById('statBJ').textContent = p.blackjacks || 0;
-  document.getElementById('statStreak').textContent = p.loginStreak || 0;
-  document.getElementById('playerStats').style.display = 'block';
-}
+function doubleDown(){if(game.balance<game.bet)return;game.balance-=game.bet;game.bet*=2;game.playerHand.push(draw());showAchievement('double_down');stand();}
 
-async function claimDaily() {
-  const result = await api('daily');
-  if (result.ok) {
-    toast(`🎁 +${result.bonus} фишек! Серия: ${result.streak} дн.`);
-    if (result.streak >= 3) showAchievement('daily_3');
-  } else {
-    toast(`⏰ Бонус через ${result.hoursLeft} ч.`);
-  }
-}
+function split(){toast('🔀 Сплит в разработке');}
 
-// ═══════════════════ ТАБЫ (ЗАМЕНИТЬ ПОЛНОСТЬЮ) ═══════════════════
-function switchTab(tab) {
-  // Скрыть все вкладки
-  document.getElementById('tab-play').style.display = 'none';
-  document.getElementById('tab-leaderboard').style.display = 'none';
-  document.getElementById('tab-achievements').style.display = 'none';
-  
-  // Показать нужную
-  document.getElementById('tab-' + tab).style.display = 'block';
-  
-  // Обновить кнопки
-  const buttons = document.querySelectorAll('.tab-btn');
-  buttons[0].classList.remove('active');
-  buttons[1].classList.remove('active');
-  buttons[2].classList.remove('active');
-  
-  if (tab === 'play') buttons[0].classList.add('active');
-  if (tab === 'leaderboard') buttons[1].classList.add('active');
-  if (tab === 'achievements') buttons[2].classList.add('active');
-  
-  // Загрузить данные
-  if (tab === 'leaderboard') loadLeaderboard();
-  if (tab === 'achievements') { loadAchievements(); loadStats(); }
-}
+function surrender(){const back=Math.floor(game.bet/2);game.balance+=back;game.bet=0;game.lastResult='surrender';game.phase='result';saveGameResult();renderGame();}
 
-// ═══════════════════ ИГРОВОЙ ДВИЖОК ═══════════════════
-let game = {
-  deck: [], playerHand: [], dealerHand: [], dealerHole: null,
-  balance: 1000, bet: 0, phase: 'betting', playerName: 'Игрок',
-  lastResult: null, insuranceBet: 0
-};
+async function endRound(){game.phase='result';const pv=hv(game.playerHand),dv=hv(game.dealerHand);let result='loss',bj=false;if(pv>21)result='loss';else if(dv>21||pv>dv){result='win';game.balance+=game.bet*2;}else if(pv===dv){result='push';game.balance+=game.bet;}if(isBJ(game.playerHand)&&pv===21){bj=true;game.balance+=Math.floor(game.bet*0.5);showAchievement('blackjack');}if(game.insuranceBet>0&&isBJ(game.dealerHand)){game.balance+=game.insuranceBet*3;showAchievement('insurance_win');}if(result==='win'&&game.lastResult==='loss')showAchievement('comeback');game.lastResult=result;game.bet=0;game.insuranceBet=0;await saveGameResult(result,bj);renderGame();}
 
-function newDeck() {
-  const S = ['♠','♥','♦','♣'], V = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
-  let d = [];
-  for (let i = 0; i < 6; i++) for (let s of S) for (let v of V) d.push({v, s});
-  for (let i = d.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [d[i], d[j]] = [d[j], d[i]]; }
-  return d;
-}
-function draw() { if (game.deck.length < 52) game.deck = newDeck(); return game.deck.pop(); }
-function cv(c) { if (!c || c.fd) return 0; if (c.v === 'A') return 11; if (['J','Q','K'].includes(c.v)) return 10; return parseInt(c.v); }
-function hv(cards) { let v = 0, a = 0; for (let c of cards) { if (!c || c.fd) continue; if (c.v === 'A') { a++; v += 11 } else if (['J','Q','K'].includes(c.v)) v += 10; else v += parseInt(c.v); } while (v > 21 && a > 0) { v -= 10; a--; } return v; }
-function isBJ(cards) { return cards.length === 2 && hv(cards) === 21; }
+async function saveGameResult(result,bj=false){console.log('💾 Сохраняю:',result,game.balance);const p=await api('recordGame',{result:result,blackjack:bj,balance:game.balance});console.log('💾 Сохранено:',p);if(p&&p.achievements){const oldAch=JSON.parse(localStorage.getItem('bj_achievements')||'[]');const newAch=p.achievements.filter(a=>!oldAch.includes(a));newAch.forEach(a=>showAchievement(a));localStorage.setItem('bj_achievements',JSON.stringify(p.achievements));}}
 
-// ═══════════════════ ОТРИСОВКА ═══════════════════
-function cardHTML(c, fd = false, fly = false) {
-  if (fd || !c) return `<div class="card fd${fly ? ' fly' : ''}"></div>`;
-  const red = c.s === '♥' || c.s === '♦';
-  return `<div class="card ${red ? 'r' : 'b'}${fly ? ' fly' : ''}"><div class="ct">${c.v}<br>${c.s}</div><div class="cm">${c.s}</div><div class="cb">${c.v}</div></div>`;
-}
-function renderGame() {
-  // Дилер
-  let dcHTML = '';
-  game.dealerHand.forEach(c => dcHTML += cardHTML(c));
-  if (game.dealerHole && game.phase !== 'dealer' && game.phase !== 'result') dcHTML += cardHTML(null, true);
-  else if (game.dealerHole) dcHTML += cardHTML(game.dealerHole);
-  document.getElementById('dealerCards').innerHTML = dcHTML || '<span style="color:rgba(255,255,255,.3);font-size:.7rem;">Пусто</span>';
-  
-  const dv = game.phase === 'dealer' || game.phase === 'result' ? hv([...game.dealerHand, ...(game.dealerHole ? [game.dealerHole] : [])]) : (game.dealerHand[0] ? cv(game.dealerHand[0]) : 0);
-  document.getElementById('dealerValue').textContent = game.phase === 'betting' ? '' : (game.phase === 'dealer' || game.phase === 'result' ? dv : (dv + ' + ?'));
-  
-  // Колода
-  document.getElementById('deckPile').textContent = game.deck.length > 0 ? '🃏' : '🔄';
-  
-  // Игрок
-  document.getElementById('playerCards').innerHTML = game.playerHand.map(c => cardHTML(c)).join('') || '<span style="color:rgba(255,255,255,.3);font-size:.7rem;">Пусто</span>';
-  const pv = hv(game.playerHand);
-  document.getElementById('playerValue').textContent = game.playerHand.length ? pv + (pv > 21 ? ' 💥' : isBJ(game.playerHand) ? ' ⭐' : '') : '';
-  document.getElementById('playerBalance').textContent = '💰 ' + game.balance;
-  document.getElementById('playerNameDisplay').textContent = game.playerName;
-  document.getElementById('betDisplay').textContent = game.bet ? '🎲 Ставка: ' + game.bet : (game.insuranceBet ? '🛡️ Страховка: ' + game.insuranceBet : '');
-  
-  // Действия
-  const act = document.getElementById('actionsRow');
-  const chips = document.getElementById('chipsRow');
-  
-  if (game.phase === 'betting') {
-    chips.innerHTML = [5, 10, 25, 50, 100].map(v => `<button class="chip" onclick="addBet(${v})">${v}</button>`).join('');
-    chips.innerHTML += `<button class="chip" onclick="clearBet()" style="background:rgba(255,255,255,.1);font-size:.5rem;">✕</button>`;
-    act.innerHTML = `<button class="btn-act btn-gold" style="grid-column:1/-1" onclick="deal()">🎴 DEAL (${game.bet || 0})</button>`;
-    document.getElementById('gameMsg').textContent = '🎲 Делайте ставку!';
-  } else if (game.phase === 'insurance') {
-    chips.innerHTML = '';
-    act.innerHTML = `
-      <button class="btn-act btn-insurance" onclick="takeInsurance(true)">🛡️ Да (${Math.floor(game.bet/2)})</button>
-      <button class="btn-act btn-stand" onclick="takeInsurance(false)">✕ Нет</button>`;
-    document.getElementById('gameMsg').textContent = '🛡️ Страховка против туза?';
-  } else if (game.phase === 'player') {
-    chips.innerHTML = '';
-    const canSplit = game.playerHand.length === 2 && cv(game.playerHand[0]) === cv(game.playerHand[1]) && game.balance >= game.bet;
-    const canDouble = game.playerHand.length === 2 && game.balance >= game.bet;
-    act.innerHTML = `
-      <button class="btn-act btn-hit" onclick="hit()">Hit</button>
-      <button class="btn-act btn-stand" onclick="stand()">Stand</button>
-      <button class="btn-act btn-double" onclick="doubleDown()" ${!canDouble ? 'disabled' : ''}>Double</button>
-      <button class="btn-act btn-split" onclick="split()" ${!canSplit ? 'disabled' : ''}>Split</button>
-      <button class="btn-act btn-surrender" onclick="surrender()" ${game.playerHand.length !== 2 ? 'disabled' : ''}>Surrender</button>`;
-    document.getElementById('gameMsg').textContent = '🎯 Ваш ход';
-  } else if (game.phase === 'dealer') {
-    chips.innerHTML = ''; act.innerHTML = '';
-    document.getElementById('gameMsg').textContent = '👔 Дилер играет...';
-  } else if (game.phase === 'result') {
-    chips.innerHTML = '';
-    act.innerHTML = `<button class="btn-act btn-gold" style="grid-column:1/-1" onclick="newRound()">🔄 Новый раунд</button>`;
-  }
-}
+function newRound(){game.playerHand=[];game.dealerHand=[];game.dealerHole=null;game.bet=0;game.insuranceBet=0;game.phase='betting';renderGame();}
 
-// ═══════════════════ ИГРОВЫЕ ДЕЙСТВИЯ ═══════════════════
-function addBet(v) {
-  if (game.phase !== 'betting') return;
-  if (game.bet + v <= game.balance) { game.bet += v; game.balance -= v; }
-  renderGame();
-}
-function clearBet() {
-  if (game.phase !== 'betting') return;
-  game.balance += game.bet; game.bet = 0; game.insuranceBet = 0;
-  renderGame();
-}
+function goHome(){document.getElementById('game-screen').classList.remove('active');document.getElementById('home-screen').classList.add('active');loadStats();loadLeaderboard();loadAchievements();}
 
-function deal() {
-  if (game.bet < 5) return toast('⚠️ Минимум 5 фишек');
-  if (game.bet >= 100) showAchievement('high_roller');
-  
-  game.deck = newDeck();
-  game.phase = 'dealing';
-  document.getElementById('gameMsg').textContent = '🃏 Раздача карт...';
-  
-  // Анимация раздачи
-  let step = 0;
-  const dealSequence = [];
-  
-  // 1-я карта игроку
-  dealSequence.push(() => { game.playerHand = [draw()]; renderGame(); });
-  // 1-я карта дилеру
-  dealSequence.push(() => { game.dealerHand = [draw()]; renderGame(); });
-  // 2-я карта игроку
-  dealSequence.push(() => { game.playerHand.push(draw()); renderGame(); });
-  // Скрытая карта дилера
-  dealSequence.push(() => { game.dealerHole = draw(); renderGame(); });
-  
-  function nextDeal() {
-    if (step < dealSequence.length) {
-      dealSequence[step]();
-      step++;
-      setTimeout(nextDeal, 400);
-    } else {
-      // Раздача закончена
-      if (game.dealerHand[0].v === 'A' && game.balance >= Math.floor(game.bet / 2)) {
-        game.phase = 'insurance';
-      } else {
-        game.phase = 'player';
-        if (hv(game.playerHand) === 21) stand();
-      }
-      renderGame();
-    }
-  }
-  
-  nextDeal();
-}
+async function startSoloGame(){const name=document.getElementById('playerName').value.trim();if(!name)return toast('⚠️ Введите имя!');game.playerName=name;const p=await api('get');game.balance=p?p.balance:1000;game.phase='betting';document.getElementById('home-screen').classList.remove('active');document.getElementById('game-screen').classList.add('active');renderGame();}
 
-function takeInsurance(yes) {
-  if (yes) {
-    game.insuranceBet = Math.floor(game.bet / 2);
-    game.balance -= game.insuranceBet;
-  }
-  game.phase = 'player';
-  if (hv(game.playerHand) === 21) stand();
-  renderGame();
-}
+function joinMultiGame(){const name=document.getElementById('playerName').value.trim();if(!name)return toast('⚠️ Введите имя!');const roomCode=document.getElementById('roomCode').value.trim().toUpperCase();if(!roomCode){const newRoom='R'+Math.random().toString(36).substring(2,6).toUpperCase();document.getElementById('roomCode').value=newRoom;connectToRoom(newRoom,name);return;}connectToRoom(roomCode,name);}
 
-function hit() {
-  const newCard = draw();
-  game.playerHand.push(newCard);
-  // Подсветить последнюю карту
-  renderGame();
-  // Анимация для последней карты
-  const cards = document.querySelectorAll('#playerCards .card');
-  if (cards.length > 0) {
-    const lastCard = cards[cards.length - 1];
-    lastCard.classList.add('fly');
-    lastCard.style.animation = 'none';
-    lastCard.offsetHeight;
-    lastCard.style.animation = 'flyFromDeck 0.4s ease-out';
-  }
-  if (hv(game.playerHand) >= 21) setTimeout(() => stand(), 500);
-}
+function connectToRoom(roomCode,name){toast('🔗 Подключение к '+roomCode+'...');try{if(multiWS){multiWS.close();}multiWS=new WebSocket(WS_URL);multiWS.onopen=()=>{toast('✅ Подключено!');multiWS.send(JSON.stringify({type:'join_multi',userId:myUserId,roomId:roomCode,username:name}));};multiWS.onmessage=(event)=>{const msg=JSON.parse(event.data);console.log('📨 Multi:',msg);if(msg.type==='joined_room'){multiRoom=msg.roomId;toast('✅ Комната: '+msg.roomId);document.getElementById('homeContent').innerHTML=`<div class="room-box"><div style="font-size:.6rem;color:rgba(255,255,255,.4)">КОД КОМНАТЫ</div><div class="room-code">${msg.roomId}</div><div class="room-players" id="multiPlayers">${msg.players.map(p=>`<span class="player-tag${p.id===myUserId?' me':''}">${p.username}${p.id===myUserId?' (Вы)':''}</span>`).join('')}</div><div class="waiting-text">Ожидание игроков... (${msg.players.length}/4)</div></div><button class="btn-share" onclick="shareMultiRoom()">📤 ПРИГЛАСИТЬ ДРУЗЕЙ</button><button class="btn-back" onclick="leaveMultiRoom()">🚪 ВЫЙТИ ИЗ КОМНАТЫ</button>`;if(msg.players.length<2){toast('📋 Отправь код другу: '+msg.roomId);}}if(msg.type==='room_update'){const playersEl=document.getElementById('multiPlayers');if(playersEl&&msg.players){playersEl.innerHTML=msg.players.map(p=>`<span class="player-tag${p.id===myUserId?' me':''}">${p.username}${p.id===myUserId?' (Вы)':''}</span>`).join('');const waitingEl=document.querySelector('.waiting-text');if(waitingEl)waitingEl.textContent=`Ожидание игроков... (${msg.players.length}/4)`;}if(msg.players&&msg.players.length>=2){toast('🎮 Можно начинать игру!');}}if(msg.type==='error'){toast('❌ '+msg.message);goHome();}};multiWS.onerror=()=>{toast('❌ Ошибка подключения');goHome();};multiWS.onclose=()=>{console.log('WebSocket закрыт');};}catch(e){toast('❌ Ошибка: '+e.message);}}
 
-function stand() {
-  game.phase = 'dealer'; 
-  renderGame();
-  game.dealerHand.push(game.dealerHole); 
-  game.dealerHole = null;
-  // Анимация открытия карты дилера
-  setTimeout(() => {
-    renderGame();
-    const dealerCards = document.querySelectorAll('#dealerCards .card');
-    if (dealerCards.length > 0) {
-      const holeCard = dealerCards[dealerCards.length - 1];
-      if (holeCard) {
-        holeCard.style.animation = 'flyFromDeck 0.5s ease-out';
-      }
-    }
-  }, 300);
-  
-  setTimeout(() => {
-    while (hv(game.dealerHand) < 17) { 
-      game.dealerHand.push(draw()); 
-      renderGame(); 
-    }
-    endRound();
-  }, 1000);
-}
+function shareMultiRoom(){if(!multiRoom)return;const text='🎰 BLACKJACK 21\n🏠 Код комнаты: '+multiRoom+'\n\n▶️ Присоединяйся: @Blackjack21Bot';if(window.Telegram?.WebApp){window.Telegram.WebApp.openTelegramLink('https://t.me/share/url?text='+encodeURIComponent(text));}else{navigator.clipboard.writeText(multiRoom).then(()=>{toast('📋 Код скопирован: '+multiRoom);});}}
 
-function doubleDown() {
-  if (game.balance < game.bet) return;
-  game.balance -= game.bet; 
-  game.bet *= 2;
-  const newCard = draw();
-  game.playerHand.push(newCard);
-  showAchievement('double_down');
-  renderGame();
-  // Анимация
-  const cards = document.querySelectorAll('#playerCards .card');
-  if (cards.length > 0) {
-    const lastCard = cards[cards.length - 1];
-    lastCard.classList.add('fly');
-    lastCard.style.animation = 'none';
-    lastCard.offsetHeight;
-    lastCard.style.animation = 'flyFromDeck 0.4s ease-out';
-  }
-  stand();
-}
+function leaveMultiRoom(){if(multiWS&&multiWS.readyState===WebSocket.OPEN){multiWS.send(JSON.stringify({type:'leave_room'}));multiWS.close();}multiRoom=null;multiWS=null;goHome();document.getElementById('roomCode').value='';}
 
-function stand() {
-  game.phase = 'dealer'; renderGame();
-  game.dealerHand.push(game.dealerHole); game.dealerHole = null;
-  setTimeout(() => {
-    while (hv(game.dealerHand) < 17) { game.dealerHand.push(draw()); renderGame(); }
-    endRound();
-  }, 600);
-}
+const quizQuestions=[{q:'🎯 Сколько очков нужно набрать в Блэкджеке для победы?',a:['21','20','18','22'],c:0,diff:'easy'},{q:'🃏 Какая карта может стоить 1 или 11 очков по выбору игрока?',a:['Король','Туз','Дама','Валет'],c:1,diff:'easy'},{q:'🧮 При каком счёте дилер ОБЯЗАН прекратить добирать карты согласно правилам казино?',a:['Мягкие 18','Твёрдые 16','Твёрдые 17','Мягкие 19'],c:2,diff:'hard'}];
+let qi=0,qok=0;
 
-function doubleDown() {
-  if (game.balance < game.bet) return;
-  game.balance -= game.bet; game.bet *= 2;
-  game.playerHand.push(draw());
-  showAchievement('double_down');
-  stand();
-}
+function showQuiz(){document.getElementById('home-screen').classList.remove('active');document.getElementById('quiz-screen').classList.add('active');qi=0;qok=0;loadQ();}
+function loadQ(){if(qi>=quizQuestions.length){quizDone();return;}const q=quizQuestions[qi];document.getElementById('quizProgress').textContent=`ВОПРОС ${qi+1} ИЗ 3`;document.getElementById('quizQuestion').textContent=q.q;document.getElementById('quizDiff').textContent=q.diff==='hard'?'СЛОЖНЫЙ':'ЛЁГКИЙ';document.getElementById('quizDiff').className='quiz-difficulty '+(q.diff==='hard'?'diff-hard':'diff-easy');document.getElementById('quizAnswers').innerHTML=q.a.map((a,i)=>`<button class="quiz-btn" onclick="answer(${i})">${a}</button>`).join('');}
+function answer(n){const q=quizQuestions[qi];const btns=document.querySelectorAll('.quiz-btn');btns.forEach(b=>b.style.pointerEvents='none');btns[q.c].classList.add('correct');if(n===q.c)qok++;else btns[n].classList.add('wrong');setTimeout(()=>{qi++;loadQ();},700);}
+function quizDone(){document.getElementById('quiz-screen').classList.remove('active');document.getElementById('home-screen').classList.add('active');document.getElementById('homeContent').style.display='flex';document.getElementById('playerName').value=tgUser?.first_name||'';if(qok>=2){toast('✅ ПРОВЕРКА ПРОЙДЕНА!');loadLeaderboard();loadAchievements();loadStats();}else{toast('❌ ПОПРОБУЙТЕ ЕЩЁ РАЗ');setTimeout(()=>{qi=0;qok=0;showQuiz();},1500);}}
 
-function split() {
-  toast('🔀 Сплит в разработке');
-}
+function toast(t){const el=document.getElementById('toast');el.textContent=t;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2000);}
 
-function surrender() {
-  const back = Math.floor(game.bet / 2);
-  game.balance += back;
-  game.bet = 0;
-  game.lastResult = 'surrender';
-  game.phase = 'result';
-  saveGameResult();
-  renderGame();
-}
-
-async function endRound() {
-  game.phase = 'result';
-  const pv = hv(game.playerHand), dv = hv(game.dealerHand);
-  let result = 'loss';
-  let bj = false;
-  
-  if (pv > 21) result = 'loss';
-  else if (dv > 21 || pv > dv) { result = 'win'; game.balance += game.bet * 2; }
-  else if (pv === dv) { result = 'push'; game.balance += game.bet; }
-  
-  if (isBJ(game.playerHand) && pv === 21) { bj = true; game.balance += Math.floor(game.bet * 0.5); showAchievement('blackjack'); }
-  if (game.insuranceBet > 0 && isBJ(game.dealerHand)) { game.balance += game.insuranceBet * 3; showAchievement('insurance_win'); }
-  if (result === 'win' && game.lastResult === 'loss') showAchievement('comeback');
-  
-  game.lastResult = result;
-  game.bet = 0; game.insuranceBet = 0;
-  
-  await saveGameResult(result, bj);
-  renderGame();
-}
-
-async function saveGameResult(result, bj = false) {
-  console.log('💾 Сохраняю игру:', result, 'баланс:', game.balance);
-  const p = await api('recordGame', {
-    result: result, 
-    blackjack: bj,
-    balance: game.balance
-  });
-  console.log('💾 Сохранено:', p);
-  if (p && p.achievements) {
-    const oldAch = JSON.parse(localStorage.getItem('bj_achievements') || '[]');
-    const newAch = p.achievements.filter(a => !oldAch.includes(a));
-    newAch.forEach(a => showAchievement(a));
-    localStorage.setItem('bj_achievements', JSON.stringify(p.achievements));
-  }
-}
-
-function newRound() {
-  game.playerHand = []; game.dealerHand = []; game.dealerHole = null;
-  game.bet = 0; game.insuranceBet = 0; game.phase = 'betting';
-  renderGame();
-}
-
-function goHome() {
-  document.getElementById('game-screen').classList.remove('active');
-  document.getElementById('home-screen').classList.add('active');
-  loadStats();
-  loadLeaderboard();
-  loadAchievements();
-}
-
-async function startSoloGame() {
-  const name = document.getElementById('playerName').value.trim();
-  if (!name) return toast('⚠️ Введите имя!');
-  game.playerName = name;
-  
-  const p = await api('get');
-  game.balance = p ? p.balance : 1000;
-  game.phase = 'betting';
-  
-  document.getElementById('home-screen').classList.remove('active');
-  document.getElementById('game-screen').classList.add('active');
-  renderGame();
-}
-
-function joinMultiGame() {
-  const name = document.getElementById('playerName').value.trim();
-  if (!name) return toast('⚠️ Введите имя!');
-  
-  const roomCode = document.getElementById('roomCode').value.trim().toUpperCase();
-  
-  // Если код не введён — создаём новую комнату
-  if (!roomCode) {
-    const newRoom = 'R' + Math.random().toString(36).substring(2, 6).toUpperCase();
-    document.getElementById('roomCode').value = newRoom;
-    connectToRoom(newRoom, name);
-    return;
-  }
-  
-  // Если код введён — подключаемся
-  connectToRoom(roomCode, name);
-}
-
-function connectToRoom(roomCode, name) {
-  toast('🔗 Подключение к ' + roomCode + '...');
-  
-  try {
-    if (multiWS) { multiWS.close(); }
-    
-    multiWS = new WebSocket('wss://blackjack-server-x391.onrender.com');
-    
-    multiWS.onopen = () => {
-      toast('✅ Подключено!');
-      multiWS.send(JSON.stringify({
-        type: 'join_multi',
-        userId: myUserId,
-        roomId: roomCode,
-        username: name
-      }));
-    };
-    
-    multiWS.onmessage = (event) => {
-      const msg = JSON.parse(event.data);
-      console.log('📨 Multi:', msg);
-      
-      if (msg.type === 'joined_room') {
-        multiRoom = msg.roomId;
-        toast('✅ Комната: ' + msg.roomId);
-        
-        // Показываем комнату
-        document.getElementById('homeContent').innerHTML = `
-          <div class="room-box">
-            <div style="font-size:.6rem;color:rgba(255,255,255,.4)">КОД КОМНАТЫ</div>
-            <div class="room-code">${msg.roomId}</div>
-            <div class="room-players" id="multiPlayers">
-              ${msg.players.map(p => `<span class="player-tag${p.id === myUserId ? ' me' : ''}">${p.username}${p.id === myUserId ? ' (Вы)' : ''}</span>`).join('')}
-            </div>
-            <div class="waiting-text">Ожидание игроков... (${msg.players.length}/4)</div>
-          </div>
-          <button class="btn-share" onclick="shareMultiRoom()">📤 ПРИГЛАСИТЬ ДРУЗЕЙ</button>
-          <button class="btn-gold" onclick="startMultiGame()" ${msg.players.length < 2 ? 'disabled' : ''}>🃏 НАЧАТЬ ИГРУ</button>
-          <button class="btn-back" onclick="leaveMultiRoom()">🚪 ВЫЙТИ ИЗ КОМНАТЫ</button>
-        `;
-        
-        if (msg.players.length < 2) {
-          toast('📋 Отправь код другу: ' + msg.roomId);
-        }
-      }
-      
-      if (msg.type === 'room_update') {
-        // Обновляем список игроков
-        const playersEl = document.getElementById('multiPlayers');
-        if (playersEl && msg.players) {
-          playersEl.innerHTML = msg.players.map(p => 
-            `<span class="player-tag${p.id === myUserId ? ' me' : ''}">${p.username}${p.id === myUserId ? ' (Вы)' : ''}</span>`
-          ).join('');
-          
-          const waitingEl = document.querySelector('.waiting-text');
-          if (waitingEl) waitingEl.textContent = `Ожидание игроков... (${msg.players.length}/4)`;
-          
-          const startBtn = document.querySelector('#homeContent .btn-gold');
-          if (startBtn) startBtn.disabled = msg.players.length < 2;
-        }
-        
-        if (msg.players && msg.players.length >= 2) {
-          toast('🎮 Можно начинать игру!');
-        }
-      }
-      
-      if (msg.type === 'error') {
-        toast('❌ ' + msg.message);
-        goHome();
-      }
-    };
-    
-    multiWS.onerror = () => {
-      toast('❌ Ошибка подключения');
-      goHome();
-    };
-    
-    multiWS.onclose = () => {
-      console.log('WebSocket закрыт');
-    };
-    
-  } catch(e) {
-    toast('❌ Ошибка: ' + e.message);
-  }
-}
-
-function shareMultiRoom() {
-  if (!multiRoom) return;
-  
-  const text = '🎰 BLACKJACK 21\n🏠 Код комнаты: ' + multiRoom + '\n\n▶️ Присоединяйся: @Blackjack21Bot';
-  
-  if (window.Telegram?.WebApp) {
-    window.Telegram.WebApp.openTelegramLink('https://t.me/share/url?text=' + encodeURIComponent(text));
-  } else {
-    navigator.clipboard.writeText(multiRoom).then(() => {
-      toast('📋 Код скопирован: ' + multiRoom);
-    });
-  }
-}
-
-function leaveMultiRoom() {
-  if (multiWS && multiWS.readyState === WebSocket.OPEN) {
-    multiWS.send(JSON.stringify({ type: 'leave_room' }));
-    multiWS.close();
-  }
-  multiRoom = null;
-  multiWS = null;
-  goHome();
-  document.getElementById('roomCode').value = '';
-}
-
-function startMultiGame() {
-  if (!multiWS || multiWS.readyState !== WebSocket.OPEN) {
-    return toast('⚠️ Нет подключения');
-  }
-  
-  multiWS.send(JSON.stringify({ type: 'start_multi_game' }));
-  toast('🃏 Игра начинается!');
-  
-  // Переключаем на игровой экран
-  document.getElementById('home-screen').classList.remove('active');
-  document.getElementById('game-screen').classList.add('active');
-  document.getElementById('gameMsg').textContent = '👥 Мультиплеер!';
-}
-    
-    multiWS.onmessage = (event) => {
-      const msg = JSON.parse(event.data);
-      toast('📨 ' + msg.type);
-      
-      if (msg.type === 'joined_room') {
-        document.getElementById('homeContent').innerHTML = `
-          <div style="text-align:center;padding:15px;">
-            <h3 style="color:#d4af37;">🏠 КОМНАТА: ${msg.roomId}</h3>
-            <p>Игроков: ${msg.players.length}</p>
-            ${msg.players.map(p => `<span class="player-tag">${p.username}</span>`).join(' ')}
-            <br><br>
-            <button class="btn-gold" onclick="leaveMultiRoom()">🚪 ВЫЙТИ</button>
-          </div>`;
-      }
-      
-      if (msg.type === 'room_update') {
-        toast('🔄 Обновление комнаты');
-      }
-      
-      if (msg.type === 'error') {
-        toast('❌ ' + msg.message);
-      }
-    };
-    
-    multiWS.onerror = () => toast('❌ Ошибка WebSocket');
-    multiWS.onclose = () => toast('🔌 Соединение закрыто');
-    
-  } catch(e) {
-    toast('❌ ' + e.message);
-  }
-}
-
-function leaveMultiRoom() {
-  if (multiWS) {
-    multiWS.send(JSON.stringify({ type: 'leave_room' }));
-    multiWS.close();
-  }
-  goHome();
-}
-// ═══════════════════ КВИЗ ═══════════════════
-const quizQuestions = [
-  {
-    q: '🎯 Сколько очков нужно набрать в Блэкджеке для победы?',
-    a: ['21', '20', '18', '22'],
-    c: 0,
-    diff: 'easy'
-  },
-  {
-    q: '🃏 Какая карта может стоить 1 или 11 очков по выбору игрока?',
-    a: ['Король', 'Туз', 'Дама', 'Валет'],
-    c: 1,
-    diff: 'easy'
-  },
-  {
-    q: '🧮 При каком счёте дилер ОБЯЗАН прекратить добирать карты согласно правилам казино?',
-    a: ['Мягкие 18', 'Твёрдые 16', 'Твёрдые 17', 'Мягкие 19'],
-    c: 2,
-    diff: 'hard'
-  }
-];
-
-let qi = 0, qok = 0;
-
-function showQuiz() {
-  document.getElementById('home-screen').classList.remove('active');
-  document.getElementById('quiz-screen').classList.add('active');
-  qi = 0; qok = 0; loadQ();
-}
-
-function loadQ() {
-  if (qi >= quizQuestions.length) { quizDone(); return; }
-  const q = quizQuestions[qi];
-  document.getElementById('quizProgress').textContent = `ВОПРОС ${qi + 1} ИЗ 3`;
-  document.getElementById('quizQuestion').textContent = q.q;
-  document.getElementById('quizDiff').textContent = q.diff === 'hard' ? 'СЛОЖНЫЙ' : 'ЛЁГКИЙ';
-  document.getElementById('quizDiff').className = 'quiz-difficulty ' + (q.diff === 'hard' ? 'diff-hard' : 'diff-easy');
-  document.getElementById('quizAnswers').innerHTML = q.a.map((a, i) => `<button class="quiz-btn" onclick="answer(${i})">${a}</button>`).join('');
-}
-
-function answer(n) {
-  const q = quizQuestions[qi];
-  const btns = document.querySelectorAll('.quiz-btn');
-  btns.forEach(b => b.style.pointerEvents = 'none');
-  btns[q.c].classList.add('correct');
-  if (n === q.c) qok++; else btns[n].classList.add('wrong');
-  setTimeout(() => { qi++; loadQ(); }, 700);
-}
-
-function quizDone() {
-  document.getElementById('quiz-screen').classList.remove('active');
-  document.getElementById('home-screen').classList.add('active');
-  document.getElementById('homeContent').style.display = 'flex';
-  document.getElementById('playerName').value = tgUser?.first_name || '';
-  
-  if (qok >= 2) {
-    toast('✅ ПРОВЕРКА ПРОЙДЕНА!');
-    loadLeaderboard();
-    loadAchievements();
-    loadStats();
-  } else {
-    toast('❌ ПОПРОБУЙТЕ ЕЩЁ РАЗ');
-    setTimeout(() => { qi = 0; qok = 0; showQuiz(); }, 1500);
-  }
-}
-
-// ═══════════════════ ВСПОМОГАТЕЛЬНЫЕ ═══════════════════
-function toast(t) {
-  const el = document.getElementById('toast');
-  el.textContent = t; el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 2000);
-}
-
-// ═══════════════════ СТАРТ ═══════════════════
-window.addEventListener('DOMContentLoaded', () => {
-  initTG();
-  showQuiz();
-  
-  // Обновляем статус бар
-  const statusBar = document.getElementById('status-bar');
-  fetch(API_URL.replace('/api/player', '/health'))
-    .then(r => r.json())
-    .then(d => {
-      if (d.status === 'online') {
-        statusBar.textContent = '🟢 СЕРВЕР ОНЛАЙН';
-        statusBar.className = 'online';
-      }
-    })
-    .catch(() => {
-      statusBar.textContent = '🔴 ОФЛАЙН';
-      statusBar.className = 'offline';
-    });
-});
+window.addEventListener('DOMContentLoaded',()=>{initTG();showQuiz();const statusBar=document.getElementById('status-bar');fetch(API_URL.replace('/api/player','/health')).then(r=>r.json()).then(d=>{if(d.status==='online'){statusBar.textContent='🟢 СЕРВЕР ОНЛАЙН';statusBar.className='online';}}).catch(()=>{statusBar.textContent='🔴 ОФЛАЙН';statusBar.className='offline';});});
 </script>
 </body>
 </html>
