@@ -103,6 +103,24 @@ body{background:#0a1a0a;font-family:Georgia,serif;color:#fff;min-height:100dvh;w
 /* Toast */
 .toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.9);color:#fff;padding:12px 25px;border-radius:25px;font-size:.8rem;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none}
 .toast.show{opacity:1}
+  
+  /* Улучшенная анимация карт */
+.card{transition:transform 0.3s ease,opacity 0.3s ease}
+.card:hover{transform:translateY(-3px);box-shadow:0 6px 15px rgba(0,0,0,.6)}
+.card.fly{animation:flyFromDeck .4s cubic-bezier(.25,.46,.45,.94)}
+@keyframes flyFromDeck{
+0%{opacity:0;transform:translate(100px,-40px) rotate(-20deg) scale(.5)}
+50%{opacity:1;transform:translate(20px,-10px) rotate(-5deg) scale(1.05)}
+100%{opacity:1;transform:translate(0,0) rotate(0) scale(1)}
+}
+.deck-pile{transition:transform .2s ease;cursor:pointer}
+.deck-pile:active{transform:translateY(-50%) scale(.9)}
+.chip{transition:all .2s ease}
+.chip:hover{transform:translateY(-2px);box-shadow:0 4px 15px rgba(212,175,55,.4)}
+.btn-act{transition:all .2s ease}
+.btn-act:not(:disabled):hover{filter:brightness(1.2)}
+.msg-banner{animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.7}}
 </style>
 </head>
 <body>
@@ -299,20 +317,30 @@ async function claimDaily() {
   }
 }
 
+// ═══════════════════ ТАБЫ (ЗАМЕНИТЬ ПОЛНОСТЬЮ) ═══════════════════
 function switchTab(tab) {
-  // Скрываем все вкладки
-  document.querySelectorAll('[id^="tab-"]').forEach(t => t.style.display = 'none');
-  // Показываем нужную
-  const target = document.getElementById('tab-' + tab);
-  if (target) target.style.display = 'block';
+  // Скрыть все вкладки
+  document.getElementById('tab-play').style.display = 'none';
+  document.getElementById('tab-leaderboard').style.display = 'none';
+  document.getElementById('tab-achievements').style.display = 'none';
   
-  // Обновляем кнопки табов
-  document.querySelectorAll('.tab-btn').forEach(b => {
-    b.classList.remove('active');
-    if (b.textContent.includes(tab === 'play' ? 'Игра' : tab === 'leaderboard' ? 'Топ' : 'Ачивки')) {
-      b.classList.add('active');
-    }
-  });
+  // Показать нужную
+  document.getElementById('tab-' + tab).style.display = 'block';
+  
+  // Обновить кнопки
+  const buttons = document.querySelectorAll('.tab-btn');
+  buttons[0].classList.remove('active');
+  buttons[1].classList.remove('active');
+  buttons[2].classList.remove('active');
+  
+  if (tab === 'play') buttons[0].classList.add('active');
+  if (tab === 'leaderboard') buttons[1].classList.add('active');
+  if (tab === 'achievements') buttons[2].classList.add('active');
+  
+  // Загрузить данные
+  if (tab === 'leaderboard') loadLeaderboard();
+  if (tab === 'achievements') { loadAchievements(); loadStats(); }
+}
   
   // Загружаем данные
   if (tab === 'leaderboard') loadLeaderboard();
@@ -344,7 +372,6 @@ function cardHTML(c, fd = false, fly = false) {
   const red = c.s === '♥' || c.s === '♦';
   return `<div class="card ${red ? 'r' : 'b'}${fly ? ' fly' : ''}"><div class="ct">${c.v}<br>${c.s}</div><div class="cm">${c.s}</div><div class="cb">${c.v}</div></div>`;
 }
-
 function renderGame() {
   // Дилер
   let dcHTML = '';
@@ -417,19 +444,42 @@ function clearBet() {
 function deal() {
   if (game.bet < 5) return toast('⚠️ Минимум 5 фишек');
   if (game.bet >= 100) showAchievement('high_roller');
-  game.deck = newDeck();
-  game.playerHand = [draw(), draw()];
-  game.dealerHand = [draw()];
-  game.dealerHole = draw();
   
-  // Проверка на страховку
-  if (game.dealerHand[0].v === 'A' && game.balance >= Math.floor(game.bet / 2)) {
-    game.phase = 'insurance';
-  } else {
-    game.phase = 'player';
-    if (hv(game.playerHand) === 21) stand();
+  game.deck = newDeck();
+  game.phase = 'dealing';
+  document.getElementById('gameMsg').textContent = '🃏 Раздача карт...';
+  
+  // Анимация раздачи
+  let step = 0;
+  const dealSequence = [];
+  
+  // 1-я карта игроку
+  dealSequence.push(() => { game.playerHand = [draw()]; renderGame(); });
+  // 1-я карта дилеру
+  dealSequence.push(() => { game.dealerHand = [draw()]; renderGame(); });
+  // 2-я карта игроку
+  dealSequence.push(() => { game.playerHand.push(draw()); renderGame(); });
+  // Скрытая карта дилера
+  dealSequence.push(() => { game.dealerHole = draw(); renderGame(); });
+  
+  function nextDeal() {
+    if (step < dealSequence.length) {
+      dealSequence[step]();
+      step++;
+      setTimeout(nextDeal, 400);
+    } else {
+      // Раздача закончена
+      if (game.dealerHand[0].v === 'A' && game.balance >= Math.floor(game.bet / 2)) {
+        game.phase = 'insurance';
+      } else {
+        game.phase = 'player';
+        if (hv(game.playerHand) === 21) stand();
+      }
+      renderGame();
+    }
   }
-  renderGame();
+  
+  nextDeal();
 }
 
 function takeInsurance(yes) {
@@ -443,9 +493,66 @@ function takeInsurance(yes) {
 }
 
 function hit() {
-  game.playerHand.push(draw());
-  if (hv(game.playerHand) >= 21) stand();
-  else renderGame();
+  const newCard = draw();
+  game.playerHand.push(newCard);
+  // Подсветить последнюю карту
+  renderGame();
+  // Анимация для последней карты
+  const cards = document.querySelectorAll('#playerCards .card');
+  if (cards.length > 0) {
+    const lastCard = cards[cards.length - 1];
+    lastCard.classList.add('fly');
+    lastCard.style.animation = 'none';
+    lastCard.offsetHeight;
+    lastCard.style.animation = 'flyFromDeck 0.4s ease-out';
+  }
+  if (hv(game.playerHand) >= 21) setTimeout(() => stand(), 500);
+}
+
+function stand() {
+  game.phase = 'dealer'; 
+  renderGame();
+  game.dealerHand.push(game.dealerHole); 
+  game.dealerHole = null;
+  // Анимация открытия карты дилера
+  setTimeout(() => {
+    renderGame();
+    const dealerCards = document.querySelectorAll('#dealerCards .card');
+    if (dealerCards.length > 0) {
+      const holeCard = dealerCards[dealerCards.length - 1];
+      if (holeCard) {
+        holeCard.style.animation = 'flyFromDeck 0.5s ease-out';
+      }
+    }
+  }, 300);
+  
+  setTimeout(() => {
+    while (hv(game.dealerHand) < 17) { 
+      game.dealerHand.push(draw()); 
+      renderGame(); 
+    }
+    endRound();
+  }, 1000);
+}
+
+function doubleDown() {
+  if (game.balance < game.bet) return;
+  game.balance -= game.bet; 
+  game.bet *= 2;
+  const newCard = draw();
+  game.playerHand.push(newCard);
+  showAchievement('double_down');
+  renderGame();
+  // Анимация
+  const cards = document.querySelectorAll('#playerCards .card');
+  if (cards.length > 0) {
+    const lastCard = cards[cards.length - 1];
+    lastCard.classList.add('fly');
+    lastCard.style.animation = 'none';
+    lastCard.offsetHeight;
+    lastCard.style.animation = 'flyFromDeck 0.4s ease-out';
+  }
+  stand();
 }
 
 function stand() {
