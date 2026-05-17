@@ -1,38 +1,115 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="format-detection" content="telephone=no">
-<title>♠ Blackjack 21</title>
-  // ═══════════════════════════════════════
-// ПОДКЛЮЧЕНИЕ К СЕРВЕРУ
-// ═══════════════════════════════════════
-const SERVER_URL = 'https://blackjack-server-yg3n.onrender.com'; // ЗАМЕНИ НА СВОЙ URL
+<title>♠ Blackjack 21 Online</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;overflow:hidden;position:fixed;top:0;left:0}
+body{background:#0b3318;font-family:Georgia,serif;color:#fff;height:100dvh;width:100vw}
+.screen{display:none;height:100dvh;width:100vw;flex-direction:column;position:absolute;top:0;left:0}
+.screen.active{display:flex}
 
-let ws = null;
-let myPlayerId = null;
-let currentRoom = null;
-let gameState = null;
+/* Вернём твои стили */
+#ss{background:radial-gradient(ellipse at 50% 25%,#1e7a38 0%,#0b3318 65%);align-items:center;justify-content:center;padding:20px;gap:18px;overflow-y:auto}
+.logo h1{font-size:2.1rem;color:#d4af37;letter-spacing:4px;text-align:center;text-shadow:0 2px 10px rgba(0,0,0,.6)}
+.logo p{font-size:.7rem;letter-spacing:3px;color:rgba(255,255,255,.4);text-align:center;margin-top:4px}
+.box{background:rgba(0,0,0,.35);border:1px solid rgba(212,175,55,.2);border-radius:16px;padding:22px;width:100%;max-width:380px;display:flex;flex-direction:column;gap:16px}
+.lbl{font-size:.65rem;text-transform:uppercase;letter-spacing:2px;color:#d4af37;margin-bottom:7px}
+.btn-go{padding:15px;background:linear-gradient(135deg,#b8891e,#e8c93a);color:#000;border:none;border-radius:12px;font-size:1rem;font-weight:bold;cursor:pointer;letter-spacing:2px;box-shadow:0 4px 20px rgba(212,175,55,.3);width:100%;transition:all .15s}
+.btn-go:active{transform:scale(.97)}
+.ni{display:block;width:100%;padding:10px 12px;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:#fff;font-size:.9rem;margin-bottom:7px;outline:none;font-family:Georgia,serif}
+.ni:focus{border-color:#d4af37}
+.ni::placeholder{color:rgba(255,255,255,.3)}
 
-// Инициализация Telegram
-const tg = window.Telegram?.WebApp;
-if (tg) {
+/* Статус подключения */
+#status{position:fixed;top:0;left:0;right:0;z-index:1000;padding:4px;text-align:center;font-size:.65rem;background:rgba(0,0,0,.9);color:#fff;letter-spacing:1px}
+#status.online{background:#27ae60}
+#status.offline{background:#e74c3c}
+
+/* Комната */
+.room-info{text-align:center;padding:10px;margin:10px 0;background:rgba(0,0,0,.3);border-radius:10px}
+.room-id{font-size:1.5rem;color:#d4af37;font-weight:bold;letter-spacing:3px}
+.room-hint{font-size:.7rem;color:rgba(255,255,255,.5);margin-top:5px}
+
+/* Игроки в комнате */
+.players-list{display:flex;flex-direction:column;gap:5px;margin:10px 0}
+.player-item{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:rgba(255,255,255,.05);border-radius:8px;font-size:.8rem}
+.player-item .status-dot{width:8px;height:8px;border-radius:50%;background:#4caf50;margin-right:8px}
+
+/* Кнопка поделиться */
+.btn-share{padding:8px 15px;background:rgba(33,150,243,.2);color:#2196f3;border:1px solid #2196f3;border-radius:8px;font-size:.75rem;cursor:pointer;letter-spacing:1px}
+</style>
+</head>
+<body>
+
+<!-- Статус подключения -->
+<div id="status" class="offline">🔴 Подключение...</div>
+
+<!-- ГЛАВНЫЙ ЭКРАН -->
+<div id="ss" class="screen active">
+  <div class="logo"><h1>♠ BLACKJACK 21 ♠</h1><p>ONLINE CASINO</p></div>
+  <div class="box" id="mainBox">
+    <div id="authSection">
+      <div class="lbl">ВАШЕ ИМЯ</div>
+      <input id="playerName" class="ni" placeholder="Введите имя" maxlength="15">
+      <button class="btn-go" onclick="startOnlineGame()">🎰 ИГРАТЬ ОНЛАЙН</button>
+    </div>
+    <div id="roomSection" style="display:none;">
+      <div class="room-info">
+        <div style="font-size:.7rem;color:rgba(255,255,255,.5);">КОД КОМНАТЫ</div>
+        <div class="room-id" id="roomIdDisplay">-----</div>
+        <div class="room-hint">Поделитесь кодом с друзьями</div>
+      </div>
+      <div class="lbl">ИГРОКИ В КОМНАТЕ</div>
+      <div class="players-list" id="playersList"></div>
+      <button class="btn-share" onclick="shareRoom()">📤 ПОДЕЛИТЬСЯ КОМНАТОЙ</button>
+      <button class="btn-go" onclick="startGameSession()" style="margin-top:10px;">🃏 НАЧАТЬ ИГРУ</button>
+    </div>
+  </div>
+</div>
+
+<!-- Отладочная информация -->
+<div id="debug" style="position:fixed;bottom:0;left:0;right:0;background:rgba(0,0,0,.8);color:#0f0;font-size:9px;padding:3px;text-align:center;z-index:999;font-family:monospace;"></div>
+
+<script>
+// ============================================
+// КОНФИГУРАЦИЯ
+// ============================================
+const SERVER_URL = 'wss://blackjack-server.onrender.com'; // ТВОЙ URL
+
+// ============================================
+// ЗАЩИТА ОТ БОТОВ
+// ============================================
+function verifyTelegramUser() {
+    const debug = document.getElementById('debug');
+    
+    if (!window.Telegram || !window.Telegram.WebApp) {
+        document.body.innerHTML = `
+            <div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#0b3318;color:white;text-align:center;font-family:Georgia,serif;padding:20px;">
+                <div>
+                    <h1 style="color:#d4af37;">🔒 ОТКРОЙТЕ В TELEGRAM</h1>
+                    <p style="margin-top:10px;">Эта игра работает только через Telegram Mini App</p>
+                    <p style="color:rgba(255,255,255,.5);font-size:.8rem;margin-top:10px;">@Blackjack21Bot</p>
+                </div>
+            </div>`;
+        return false;
+    }
+    
+    const tg = window.Telegram.WebApp;
     tg.ready();
     tg.expand();
-}
-
-// Защита от ботов
-function verifyUser() {
-    if (!tg || !tg.initDataUnsafe?.user) {
+    
+    if (!tg.initDataUnsafe || !tg.initDataUnsafe.user) {
         document.body.innerHTML = `
-            <div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#0b3318;color:white;text-align:center;font-family:Georgia,serif;">
+            <div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#0b3318;color:white;text-align:center;font-family:Georgia,serif;padding:20px;">
                 <div>
-                    <h1 style="color:#d4af37;">🔒 ДОСТУП ЗАПРЕЩЁН</h1>
-                    <p>Откройте игру через Telegram Mini App</p>
-                    <p style="color:rgba(255,255,255,.5);font-size:.8rem;margin-top:10px;">
-                        @Blackjack21Bot
-                    </p>
+                    <h1 style="color:#d4af37;">🔒 ВЕРИФИКАЦИЯ</h1>
+                    <p style="margin-top:10px;">Не удалось подтвердить личность</p>
+                    <button onclick="window.Telegram.WebApp.close()" style="padding:10px 20px;background:#d4af37;color:black;border:none;border-radius:8px;margin-top:15px;cursor:pointer;">ЗАКРЫТЬ</button>
                 </div>
             </div>`;
         return false;
@@ -44,85 +121,135 @@ function verifyUser() {
         firstName: tg.initDataUnsafe.user.first_name || 'Guest',
     };
     
+    debug.textContent = '✅ Telegram: ' + window.telegramUser.username;
     return true;
 }
 
-// Подключение к серверу
+// ============================================
+// WebSocket ПОДКЛЮЧЕНИЕ
+// ============================================
+let ws = null;
+let myPlayerId = null;
+let currentRoom = null;
+let isConnected = false;
+
 function connectToServer() {
-    if (!verifyUser()) return;
+    const debug = document.getElementById('debug');
+    const status = document.getElementById('status');
+    
+    if (!verifyTelegramUser()) return;
+    
+    debug.textContent = '🔄 Подключение к серверу...';
     
     ws = new WebSocket(SERVER_URL);
     
     ws.onopen = () => {
-        console.log('✅ Connected to server');
+        isConnected = true;
+        status.textContent = '🟢 ОНЛАЙН';
+        status.className = 'online';
+        debug.textContent = '✅ Подключено к серверу';
         
-        // Авторизуемся
+        // Авторизация
         ws.send(JSON.stringify({
             type: 'auth',
             telegramId: window.telegramUser.id,
             username: window.telegramUser.username,
         }));
         
-        // Показываем экран верификации
-        showVerificationScreen();
+        // Пинг каждые 30 секунд
+        setInterval(() => {
+            if (ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'ping' }));
+            }
+        }, 30000);
     };
     
     ws.onmessage = (event) => {
         const msg = JSON.parse(event.data);
-        handleServerMessage(msg);
+        debug.textContent = '📨 ' + msg.type;
+        handleMessage(msg);
     };
     
     ws.onclose = () => {
-        console.log('❌ Disconnected from server');
-        // Пытаемся переподключиться через 5 секунд
+        isConnected = false;
+        status.textContent = '🔴 ОФЛАЙН — Переподключение...';
+        status.className = 'offline';
+        debug.textContent = '❌ Соединение потеряно';
+        
         setTimeout(connectToServer, 5000);
     };
     
-    ws.onerror = (error) => {
-        console.error('WebSocket error:', error);
+    ws.onerror = (err) => {
+        debug.textContent = '❌ Ошибка подключения';
+        console.error('WebSocket error:', err);
     };
 }
 
-// Экран верификации (защита от ботов)
-function showVerificationScreen() {
-    const verifyHTML = `
-    <div id="verifyScreen" style="display:flex;align-items:center;justify-content:center;height:100vh;background:radial-gradient(ellipse at 50% 25%,#1e7a38 0%,#0b3318 65%);font-family:Georgia,serif;color:white;text-align:center;padding:20px;position:fixed;inset:0;z-index:999;">
-        <div>
-            <h1 style="color:#d4af37;font-size:2rem;margin-bottom:20px;">🃏 BLACKJACK 21</h1>
-            <div style="background:rgba(0,0,0,.35);border:1px solid rgba(212,175,55,.2);border-radius:16px;padding:30px;max-width:350px;">
-                <p style="font-size:1.2rem;color:#d4af37;margin-bottom:10px;">
-                    👋 Привет, ${window.telegramUser?.firstName || 'Игрок'}!
-                </p>
-                <p style="font-size:.9rem;color:rgba(255,255,255,.7);margin-bottom:20px;">
-                    Нажми кнопку чтобы начать игру
-                </p>
-                <button onclick="startGame()" style="padding:15px 40px;background:linear-gradient(135deg,#b8891e,#e8c93a);color:black;border:none;border-radius:12px;font-size:1.1rem;font-weight:bold;cursor:pointer;letter-spacing:2px;box-shadow:0 4px 20px rgba(212,175,55,.3);">
-                    ✅ Я ЧЕЛОВЕК — ИГРАТЬ!
-                </button>
-                <p style="font-size:.65rem;color:rgba(255,255,255,.3);margin-top:15px;">
-                    Баланс: 🪙 ${getBalance()} | Защита от ботов
-                </p>
-            </div>
-        </div>
-    </div>`;
-    
-    document.body.insertAdjacentHTML('beforeend', verifyHTML);
+// ============================================
+// ОБРАБОТКА СООБЩЕНИЙ
+// ============================================
+function handleMessage(msg) {
+    switch (msg.type) {
+        case 'auth_ok':
+            myPlayerId = msg.playerId;
+            document.getElementById('playerName').value = msg.username || '';
+            document.getElementById('debug').textContent = '✅ Авторизован: ' + msg.username + ' | Баланс: ' + msg.balance;
+            break;
+        
+        case 'room_created':
+            currentRoom = msg.roomId;
+            showRoomScreen(msg.roomId);
+            break;
+        
+        case 'room_joined':
+            currentRoom = msg.roomId;
+            showRoomScreen(msg.roomId);
+            updatePlayersList(msg.players);
+            break;
+        
+        case 'player_joined':
+            document.getElementById('debug').textContent = '👤 ' + msg.username + ' присоединился';
+            // Обновить список игроков
+            break;
+        
+        case 'pong':
+            // Сервер жив
+            break;
+        
+        case 'error':
+            alert('❌ ' + msg.message);
+            break;
+        
+        default:
+            console.log('Неизвестное сообщение:', msg);
+    }
 }
 
-function startGame() {
-    document.getElementById('verifyScreen')?.remove();
+// ============================================
+// ИГРОВЫЕ ФУНКЦИИ
+// ============================================
+function startOnlineGame() {
+    if (!isConnected) {
+        alert('⚠️ Нет подключения к серверу. Подождите...');
+        return;
+    }
     
-    // Создаём комнату
-    const roomId = getRoomFromURL() || generateRoomId();
+    const name = document.getElementById('playerName').value.trim();
+    if (!name) {
+        alert('Введите ваше имя!');
+        return;
+    }
     
-    ws.send(JSON.stringify({
-        type: 'create_room',
-        roomId: roomId,
-        username: window.telegramUser.username,
-    }));
-    
-    // Показываем основной экран игры
-    document.getElementById('ss').classList.add('active');
+    // Проверка на ботов: небольшая задержка
+    setTimeout(() => {
+        const roomId = getRoomFromURL() || ('ROOM' + Math.random().toString(36).substring(2, 6).toUpperCase());
+        
+        ws.send(JSON.stringify({
+            type: 'create_room',
+            roomId: roomId,
+            username: name,
+        }));
+    }, 500);
 }
 
 function getRoomFromURL() {
@@ -130,686 +257,72 @@ function getRoomFromURL() {
     return params.get('room');
 }
 
-function generateRoomId() {
-    return Math.random().toString(36).substring(2, 8).toUpperCase();
+function showRoomScreen(roomId) {
+    document.getElementById('authSection').style.display = 'none';
+    document.getElementById('roomSection').style.display = 'block';
+    document.getElementById('roomIdDisplay').textContent = roomId;
+    document.getElementById('debug').textContent = '🏠 Комната: ' + roomId;
 }
 
-function getBalance() {
-    return localStorage.getItem('blackjack_balance') || '1000';
+function updatePlayersList(players) {
+    const list = document.getElementById('playersList');
+    list.innerHTML = players.map(p => `
+        <div class="player-item">
+            <span><span class="status-dot"></span> ${p.username}</span>
+            <span style="color:rgba(255,255,255,.5);font-size:.7rem;">ID: ${p.id.slice(0,6)}</span>
+        </div>
+    `).join('');
 }
 
-// Обработка сообщений от сервера
-function handleServerMessage(msg) {
-    switch (msg.type) {
-        case 'auth_ok':
-            myPlayerId = msg.playerId;
-            localStorage.setItem('blackjack_player_id', myPlayerId);
-            localStorage.setItem('blackjack_balance', msg.balance);
-            break;
-            
-        case 'room_created':
-            currentRoom = msg.roomId;
-            console.log('🎰 Room created:', currentRoom);
-            console.log('📨 Invite link:', msg.inviteLink);
-            break;
-            
-        case 'player_hit':
-            updatePlayerCards(msg.playerId, msg.card, msg.value);
-            break;
-            
-        case 'player_stand':
-            showPlayerStatus(msg.playerId, '✋ Stand');
-            break;
-            
-        // ... добавь другие обработчики
+function shareRoom() {
+    if (!currentRoom) return;
+    
+    const shareText = encodeURIComponent(
+        '🎰 Играю в Блэкджек 21!\n' +
+        'Код комнаты: ' + currentRoom + '\n' +
+        'Присоединяйся: https://t.me/ВАШ_БОТ?start=' + currentRoom
+    );
+    
+    const shareURL = 'https://t.me/share/url?url=https://t.me/ВАШ_БОТ&text=' + shareText;
+    
+    if (window.Telegram?.WebApp) {
+        window.Telegram.WebApp.openTelegramLink(shareURL);
+    } else {
+        // Копируем код комнаты
+        navigator.clipboard.writeText(currentRoom).then(() => {
+            alert('📋 Код комнаты скопирован: ' + currentRoom + '\nОтправьте его друзьям!');
+        });
     }
 }
 
-// Запускаем подключение при загрузке
+function startGameSession() {
+    ws.send(JSON.stringify({
+        type: 'start_game',
+        roomId: currentRoom,
+    }));
+    
+    document.getElementById('debug').textContent = '🃏 Игра начинается...';
+}
+
+// ============================================
+// ЗАПУСК
+// ============================================
 window.addEventListener('DOMContentLoaded', () => {
     connectToServer();
-});
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<style>
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{width:100%;height:100%;overflow:hidden;position:fixed;top:0;left:0}
-body{background:#0b3318;font-family:Georgia,serif;color:#fff;height:100dvh;width:100vw}
-.screen{display:none;height:100dvh;width:100vw;flex-direction:column;position:absolute;top:0;left:0}
-.screen.active{display:flex}
-
-/* ── SETUP ── */
-#ss{background:radial-gradient(ellipse at 50% 25%,#1e7a38 0%,#0b3318 65%);align-items:center;justify-content:center;padding:20px;gap:18px;overflow-y:auto}
-.logo h1{font-size:2.1rem;color:#d4af37;letter-spacing:4px;text-align:center;text-shadow:0 2px 10px rgba(0,0,0,.6)}
-.logo p{font-size:.7rem;letter-spacing:3px;color:rgba(255,255,255,.4);text-align:center;margin-top:4px}
-.box{background:rgba(0,0,0,.35);border:1px solid rgba(212,175,55,.2);border-radius:16px;padding:22px;width:100%;max-width:380px;display:flex;flex-direction:column;gap:16px}
-.lbl{font-size:.65rem;text-transform:uppercase;letter-spacing:2px;color:#d4af37;margin-bottom:7px}
-.brow{display:flex;gap:7px}
-.brow button{flex:1;padding:10px 5px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.07);color:#fff;border-radius:8px;cursor:pointer;font-size:1rem;transition:all .15s}
-.brow button.sel{background:#d4af37;color:#000;border-color:#d4af37;font-weight:bold}
-.ni{display:block;width:100%;padding:10px 12px;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:#fff;font-size:.9rem;margin-bottom:7px;outline:none;font-family:Georgia,serif}
-.ni:focus{border-color:#d4af37}
-.ni::placeholder{color:rgba(255,255,255,.3)}
-.btn-go{padding:15px;background:linear-gradient(135deg,#b8891e,#e8c93a);color:#000;border:none;border-radius:12px;font-size:1rem;font-weight:bold;cursor:pointer;letter-spacing:2px;box-shadow:0 4px 20px rgba(212,175,55,.3);width:100%;transition:all .15s}
-.btn-go:active{transform:scale(.97)}
-
-/* ── GAME FRAME ── */
-#sg{background:radial-gradient(ellipse at 50% -10%,#1a6b30 0%,#0b3318 100%)}
-#pbar{background:rgba(0,0,0,.5);padding:5px 12px;font-size:.62rem;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);text-align:center;flex-shrink:0}
-#pbar b{color:#d4af37}
-
-/* ── DEALER ── */
-#da{padding:8px 10px 6px;text-align:center;background:rgba(0,0,0,.2);border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0}
-.dlbl{font-size:.62rem;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,.45)}
-.dscore{font-size:1.25rem;font-weight:bold;color:#d4af37;min-height:26px;line-height:26px}
-
-/* ── CARDS ── */
-.crow{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;padding:3px 0}
-.card{width:38px;height:54px;background:#fff;border-radius:5px;display:flex;flex-direction:column;justify-content:space-between;padding:2px 3px;box-shadow:0 2px 7px rgba(0,0,0,.5);font-weight:bold;flex-shrink:0;animation:pop .22s ease-out}
-.card.r{color:#c0392b}.card.bk{color:#1a1a1a}
-.ct{font-size:.7rem;line-height:1;text-align:left}
-.cm{font-size:.95rem;text-align:center;line-height:1}
-.cb{font-size:.7rem;line-height:1;text-align:right;transform:rotate(180deg)}
-.card.fd{background:repeating-linear-gradient(45deg,#163b7a 0,#163b7a 4px,#0d265c 4px,#0d265c 8px);border:2px solid rgba(255,255,255,.15)}
-.csm{width:30px;height:42px}.csm .ct,.csm .cb{font-size:.6rem}.csm .cm{font-size:.75rem}
-@keyframes pop{from{opacity:0;transform:translateY(-10px) scale(.8)}to{opacity:1;transform:none}}
-
-/* ── PLAYERS ── */
-#pa{flex:1;padding:6px;display:grid;grid-template-columns:1fr 1fr;gap:6px;overflow-y:auto;align-content:start}
-#pa.s1{grid-template-columns:1fr}
-.seat{background:rgba(0,0,0,.25);border:2px solid rgba(255,255,255,.07);border-radius:10px;padding:7px;transition:border-color .2s,background .2s}
-.seat.on{border-color:#d4af37;background:rgba(212,175,55,.07);box-shadow:0 0 12px rgba(212,175,55,.2)}
-.seat.dim{opacity:.6}
-.sn{display:flex;justify-content:space-between;align-items:center;font-size:.68rem;font-weight:bold;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,.8);margin-bottom:4px}
-.sb{font-size:.62rem;color:#d4af37}
-.sv{font-size:.82rem;font-weight:bold;text-align:center;margin-top:2px}
-.sv.bust{color:#e74c3c}.sv.bjv{color:#d4af37}
-.sbet{font-size:.62rem;color:rgba(255,255,255,.45);text-align:center}
-.hsep{border-top:1px dashed rgba(255,255,255,.12);margin:5px 0}
-
-/* ── ACTION ── */
-#aa{padding:9px 10px;background:rgba(0,0,0,.42);border-top:1px solid rgba(255,255,255,.07);flex-shrink:0}
-.atit{text-align:center;font-size:.72rem;color:rgba(255,255,255,.6);letter-spacing:1px;margin-bottom:7px}
-.atit b{color:#d4af37}
-.abtns{display:grid;grid-template-columns:1fr 1fr;gap:7px}
-.ab{padding:11px 6px;border:none;border-radius:9px;font-size:.78rem;font-weight:bold;cursor:pointer;letter-spacing:1px;text-transform:uppercase;transition:all .12s}
-.ab:active{transform:scale(.94)}.ab:disabled{opacity:.28;cursor:not-allowed;transform:none}
-.ab.full{grid-column:1/-1}
-.ahit{background:#27ae60;color:#fff}.astand{background:#e74c3c;color:#fff}
-.adbl{background:#2980b9;color:#fff}.aspl{background:#8e44ad;color:#fff}
-.asurr{background:rgba(255,255,255,.14);color:#fff;font-size:.7rem}
-
-/* ── BETTING ── */
-.bwrap{text-align:center}
-.bwho{font-size:.88rem;font-weight:bold;color:#d4af37;margin-bottom:2px}
-.bbal{font-size:.7rem;color:rgba(255,255,255,.5);margin-bottom:5px}
-.bamt{font-size:2rem;font-weight:bold;margin:3px 0}
-.chips{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;margin-bottom:7px}
-.chip{width:42px;height:42px;border-radius:50%;border:3px solid rgba(255,255,255,.35);font-size:.67rem;font-weight:bold;color:#fff;cursor:pointer;transition:all .12s;background:none}
-.chip:active{transform:scale(.87)}
-.ch5{background:#e74c3c}.ch10{background:#2980b9}.ch25{background:#27ae60}.ch50{background:#8e44ad}.ch100{background:#2c3e50}
-.bacts{display:flex;gap:8px;justify-content:center}
-.bcl{padding:9px 18px;background:rgba(255,255,255,.1);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:.82rem}
-.bco{padding:9px 24px;background:#d4af37;color:#000;border:none;border-radius:8px;cursor:pointer;font-size:.88rem;font-weight:bold}
-
-/* ── INSURANCE ── */
-.inswrap{background:rgba(211,84,0,.14);border:1px solid rgba(211,84,0,.38);border-radius:10px;padding:10px;text-align:center}
-.inswho{font-size:.85rem;font-weight:bold;color:#e67e22;margin-bottom:3px}
-.insdesc{font-size:.72rem;color:rgba(255,255,255,.7);line-height:1.5;margin-bottom:8px}
-.insbtns{display:flex;gap:8px}
-.insyes{flex:1;padding:9px;background:#d35400;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:bold}
-.insno{flex:1;padding:9px;background:rgba(255,255,255,.1);color:#fff;border:none;border-radius:8px;cursor:pointer}
-
-/* ── RESULTS ── */
-#ro{display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:300;overflow-y:auto;padding:20px}
-#ro.on{display:block}
-.rtit{text-align:center;font-size:1.35rem;color:#d4af37;font-weight:bold;letter-spacing:2px;margin-bottom:14px}
-.ri{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:11px 14px;margin-bottom:8px}
-.rname{font-size:.87rem;font-weight:bold}
-.rinfo{font-size:.73rem;color:rgba(255,255,255,.5);margin-top:2px}
-.rpay{font-size:.97rem;font-weight:bold;margin-top:4px}
-.rwin{color:#2ecc71}.rloss{color:#e74c3c}.rpush{color:#95a5a6}.rbj{color:#d4af37}
-.rbtns{display:flex;gap:10px;margin-top:16px}
-.rnext{flex:1;padding:14px;background:#d4af37;color:#000;border:none;border-radius:10px;font-size:.93rem;font-weight:bold;cursor:pointer}
-.rnew{padding:14px 18px;background:rgba(255,255,255,.1);color:#fff;border:none;border-radius:10px;font-size:.83rem;cursor:pointer}
-.dealer-turn{text-align:center;padding:13px;color:rgba(255,255,255,.45);font-size:.78rem;letter-spacing:2px}
-
-/* ── MSG ── */
-#mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:400;align-items:center;justify-content:center}
-#mo.on{display:flex}
-.mbox{background:linear-gradient(135deg,#1e7a38,#0b3318);border:2px solid #d4af37;border-radius:16px;padding:26px 32px;text-align:center;max-width:290px;width:90%}
-.mt{font-size:1.25rem;color:#d4af37;font-weight:bold;margin-bottom:7px}
-.mb{font-size:.83rem;color:rgba(255,255,255,.75);margin-bottom:16px;line-height:1.5}
-.mok{padding:10px 26px;background:#d4af37;color:#000;border:none;border-radius:9px;font-size:.92rem;font-weight:bold;cursor:pointer}
-</style>
-</head>
-<body>
-
-<!-- SETUP -->
-<div id="ss" class="screen active">
-  <div class="logo"><h1>♠ BLACKJACK 21 ♠</h1><p>CASINO ROYALE</p></div>
-  <div class="box">
-    <div>
-      <div class="lbl">Number of Players</div>
-      <div class="brow" id="pc">
-        <button onclick="setPC(1)" id="pc1">1</button>
-        <button onclick="setPC(2)" id="pc2" class="sel">2</button>
-        <button onclick="setPC(3)" id="pc3">3</button>
-        <button onclick="setPC(4)" id="pc4">4</button>
-      </div>
-    </div>
-    <div id="nsec"></div>
-    <div>
-      <div class="lbl">Starting Chips</div>
-      <div class="brow" id="bc">
-        <button onclick="setBal(500)" id="b500">500</button>
-        <button onclick="setBal(1000)" id="b1000" class="sel">1,000</button>
-        <button onclick="setBal(5000)" id="b5000">5,000</button>
-      </div>
-    </div>
-    <button class="btn-go" onclick="startGame()">♠ DEAL ME IN ♠</button>
-  </div>
-</div>
-
-<!-- GAME -->
-<div id="sg" class="screen">
-  <div id="pbar">♠ BLACKJACK 21</div>
-  <div id="da">
-    <div class="dlbl">DEALER</div>
-    <div class="crow" id="dc"></div>
-    <div class="dscore" id="dsc"></div>
-  </div>
-  <div id="pa"></div>
-  <div id="aa"></div>
-</div>
-
-<!-- RESULTS -->
-<div id="ro">
-  <div class="rtit">🃏 ROUND RESULTS</div>
-  <div id="rb"></div>
-  <div class="rbtns">
-    <button class="rnext" onclick="nextRound()">▶ Next Round</button>
-    <button class="rnew" onclick="newGame()">↩ New Game</button>
-  </div>
-</div>
-
-<!-- MSG -->
-<div id="mo"><div class="mbox">
-  <div class="mt" id="mt"></div>
-  <div class="mb" id="mb"></div>
-  <button class="mok" onclick="closeMsg()">OK</button>
-</div></div>
-
-<!-- DEBUG (Shows if Telegram detected) -->
-<div id="debugInfo" style="position:fixed;bottom:0;left:0;right:0;background:rgba(0,0,0,.8);color:#fff;font-size:10px;padding:4px;text-align:center;z-index:999;display:none;"></div>
-
-<script>
-// ═══════════════════════════════════════
-// TELEGRAM INITIALIZATION — THIS IS THE FIX
-// ═══════════════════════════════════════
-(function initTelegram() {
-    const debug = document.getElementById('debugInfo');
     
-    try {
-        if (window.Telegram && window.Telegram.WebApp) {
-            const tg = window.Telegram.WebApp;
-            tg.ready();
-            tg.expand();
-            
-            // Match Telegram theme
-            if (tg.themeParams) {
-                if (tg.themeParams.secondary_bg_color) {
-                    document.body.style.backgroundColor = tg.themeParams.secondary_bg_color;
-                }
-                if (tg.themeParams.text_color) {
-                    document.body.style.color = tg.themeParams.text_color;
-                }
-            }
-            
-            // Show success briefly
-            debug.style.display = 'block';
-            debug.textContent = '✅ Telegram WebApp Ready | Platform: ' + (tg.platform || 'unknown');
-            debug.style.color = '#4caf50';
-            
-            setTimeout(() => {
-                debug.style.display = 'none';
-            }, 2000);
-            
-            console.log('Telegram WebApp initialized successfully');
-        } else {
-            // Running in browser
-            debug.style.display = 'block';
-            debug.textContent = '⚠️ Running in Browser Mode';
-            debug.style.color = '#ff9800';
-            
-            setTimeout(() => {
-                debug.style.display = 'none';
-            }, 3000);
-            
-            console.log('Not running in Telegram WebApp');
-        }
-    } catch (error) {
-        debug.style.display = 'block';
-        debug.textContent = '❌ Error: ' + error.message;
-        debug.style.color = '#f44336';
-        
-        console.error('Telegram initialization error:', error);
+    // Если есть код комнаты в URL — авто-подключение
+    const roomFromURL = getRoomFromURL();
+    if (roomFromURL) {
+        document.getElementById('debug').textContent = '🔗 Присоединение к комнате: ' + roomFromURL;
     }
-})();
+});
 
-// ═══════════════════════════════════════
-// YOUR ORIGINAL GAME CODE (unchanged)
-// ═══════════════════════════════════════
-
-// ── CONFIG ──
-let cfg = {pc:2, bal:1000};
-
-// ── STATE ──
-let G = {};
-
-// ── SETUP ──
-function setPC(n){
-  cfg.pc=n;
-  document.querySelectorAll('#pc button').forEach(b=>b.classList.remove('sel'));
-  document.getElementById('pc'+n).classList.add('sel');
-  renderNames();
-}
-function setBal(n){
-  cfg.bal=n;
-  document.querySelectorAll('#bc button').forEach(b=>b.classList.remove('sel'));
-  document.getElementById('b'+n).classList.add('sel');
-}
-function renderNames(){
-  const s=document.getElementById('nsec');
-  s.innerHTML='<div class="lbl">Player Names</div>';
-  for(let i=1;i<=cfg.pc;i++){
-    const old=document.getElementById('n'+i);
-    s.innerHTML+=`<input id="n${i}" class="ni" placeholder="Player ${i}" value="${old?.value||'Player '+i}">`;
-  }
-}
-function startGame(){
-  G={players:[],dealer:{cards:[],hole:null},deck:[],phase:'betting',betIdx:0,curP:0,curH:0,insIdx:0};
-  for(let i=1;i<=cfg.pc;i++){
-    const nm=(document.getElementById('n'+i)?.value?.trim()||'Player '+i).slice(0,12);
-    G.players.push({id:i,name:nm,bal:cfg.bal,hands:[],insBet:0,tmpBet:0});
-  }
-  showScreen('sg');
-  startBetting();
-}
-
-function showScreen(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-
-// ── DECK ──
-function newDeck(){
-  const S=['♠','♥','♦','♣'],R=['A','2','3','4','5','6','7','8','9','10','J','Q','K'],d=[];
-  for(let i=0;i<6;i++) for(let s of S) for(let r of R) d.push({s,r});
-  return d;
-}
-function shuffle(d){
-  for(let i=d.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[d[i],d[j]]=[d[j],d[i]];}
-  return d;
-}
-function draw(){
-  if(G.deck.length<78) G.deck=shuffle(newDeck());
-  return G.deck.pop();
-}
-
-// ── HAND MATH ──
-function cv(c){
-  if(!c||c.fd) return 0;
-  if(c.r==='A') return 11;
-  if(['J','Q','K'].includes(c.r)) return 10;
-  return parseInt(c.r);
-}
-function hv(cards){
-  let v=0,a=0;
-  for(let c of cards){
-    if(!c||c.fd) continue;
-    if(c.r==='A'){a++;v+=11;}
-    else if(['J','Q','K'].includes(c.r)) v+=10;
-    else v+=parseInt(c.r);
-  }
-  while(v>21&&a>0){v-=10;a--;}
-  return v;
-}
-function bust(c){return hv(c)>21;}
-function bj(c){return c.length===2&&hv(c)===21;}
-function canSplit(h){
-  if(h.cards.length!==2) return false;
-  return cv(h.cards[0])===cv(h.cards[1]);
-}
-function isRed(s){return s==='♥'||s==='♦';}
-
-// ── BETTING ──
-function startBetting(){
-  G.phase='betting'; G.betIdx=0;
-  for(let p of G.players){p.hands=[];p.insBet=0;p.tmpBet=0;}
-  G.dealer={cards:[],hole:null};
-  render();
-}
-function addChip(v){
-  const p=G.players[G.betIdx];
-  if(p.tmpBet+v>p.bal) return;
-  p.tmpBet+=v; renderAA();
-}
-function clearBet(){G.players[G.betIdx].tmpBet=0;renderAA();}
-function confirmBet(){
-  const p=G.players[G.betIdx];
-  if(p.tmpBet<5){showMsg('Minimum Bet','The minimum bet is 5 chips!');return;}
-  p._bet=p.tmpBet; p.tmpBet=0;
-  G.betIdx++;
-  if(G.betIdx>=G.players.length) dealCards();
-  else render();
-}
-
-// ── DEAL ──
-function dealCards(){
-  for(let p of G.players){
-    p.bal-=p._bet;
-    p.hands=[{cards:[],bet:p._bet,dbl:false,surr:false,fromSpl:false}];
-    delete p._bet;
-  }
-  G.dealer.cards=[];
-  for(let r=0;r<2;r++){
-    for(let p of G.players) p.hands[0].cards.push(draw());
-    G.dealer.cards.push(draw());
-  }
-  G.dealer.hole=G.dealer.cards[1];
-  G.dealer.cards[1]={fd:true};
-  if(G.dealer.cards[0].r==='A'){G.phase='insurance';G.insIdx=0;render();}
-  else startPlay();
-}
-
-// ── INSURANCE ──
-function insDecide(take){
-  const p=G.players[G.insIdx];
-  if(take){const ib=Math.floor(p.hands[0].bet/2);if(p.bal>=ib){p.insBet=ib;p.bal-=ib;}}
-  G.insIdx++;
-  if(G.insIdx>=G.players.length){
-    if(bj([G.dealer.cards[0],G.dealer.hole])){
-      G.dealer.cards[1]=G.dealer.hole;
-      G.phase='results'; render();
-      setTimeout(showResults,600);
-    } else startPlay();
-  } else render();
-}
-
-// ── PLAY ──
-function startPlay(){
-  G.phase='playing'; G.curP=0; G.curH=0;
-  advance(); render();
-}
-function advance(){
-  while(G.curP<G.players.length){
-    const p=G.players[G.curP];
-    const h=p.hands[G.curH];
-    if(!h){G.curP++;G.curH=0;continue;}
-    if(bj(h.cards)&&!h.fromSpl){skip();continue;}
-    if(hv(h.cards)===21){skip();continue;}
-    if(h.fromSpl&&h.cards[0]?.r==='A'&&h.cards.length>=2){skip();continue;}
-    break;
-  }
-  if(G.curP>=G.players.length) dealerTurn();
-}
-function skip(){
-  const p=G.players[G.curP];
-  G.curH++;
-  if(G.curH>=p.hands.length){G.curP++;G.curH=0;}
-}
-
-// ── ACTIONS ──
-function doHit(){
-  const h=G.players[G.curP].hands[G.curH];
-  h.cards.push(draw());
-  if(bust(h.cards)||hv(h.cards)===21){skip();advance();}
-  render();
-}
-function doStand(){skip();advance();render();}
-function doDbl(){
-  const p=G.players[G.curP],h=p.hands[G.curH];
-  if(p.bal<h.bet){showMsg('Not Enough Chips','You need more chips to Double Down.');return;}
-  p.bal-=h.bet; h.bet*=2; h.dbl=true;
-  h.cards.push(draw());
-  skip();advance();render();
-}
-function doSpl(){
-  const p=G.players[G.curP],h=p.hands[G.curH];
-  if(!canSplit(h)) return;
-  if(p.bal<h.bet){showMsg('Not Enough Chips','You need more chips to Split.');return;}
-  if(p.hands.length>=4){showMsg('Max Splits','Maximum of 4 hands per player.');return;}
-  p.bal-=h.bet;
-  const c2=h.cards.pop();
-  h.cards.push(draw());
-  const nh={cards:[c2,draw()],bet:h.bet,dbl:false,surr:false,fromSpl:true};
-  p.hands.splice(G.curH+1,0,nh);
-  if(h.cards[0].r==='A'){skip();advance();}
-  render();
-}
-function doSurr(){
-  const p=G.players[G.curP],h=p.hands[G.curH];
-  h.surr=true;
-  p.bal+=Math.floor(h.bet/2);
-  skip();advance();render();
-}
-
-// ── DEALER ──
-function dealerTurn(){
-  G.phase='dealer';
-  G.dealer.cards[1]=G.dealer.hole;
-  render();
-  const allOut=G.players.every(p=>p.hands.every(h=>bust(h.cards)||h.surr));
-  setTimeout(()=>{ if(allOut) showResults(); else drawDealer(); },700);
-}
-function drawDealer(){
-  if(hv(G.dealer.cards)>=17){showResults();return;}
-  G.dealer.cards.push(draw());
-  render();
-  setTimeout(drawDealer,500);
-}
-
-// ── RESULTS ──
-function showResults(){
-  G.phase='results'; render();
-  const dc=G.dealer.cards, dv=hv(dc), dBJ=bj(dc), dBust=bust(dc);
-  let html=`<div class="ri" style="border-color:rgba(212,175,55,.3)">
-    <div class="rname">🎰 DEALER</div>
-    <div class="rinfo">${dc.map(c=>c.r+c.s).join(' ')} = ${dv}${dBJ?' ⭐ BLACKJACK':dBust?' 💥 BUST':''}</div>
-  </div>`;
-
-  for(let p of G.players){
-    for(let hi=0;hi<p.hands.length;hi++){
-      const h=p.hands[hi], pv=hv(h.cards);
-      const lbl=p.hands.length>1?` (Hand ${hi+1})`:'';
-      let out,css,delta=0;
-      if(h.surr){
-        out='SURRENDER';css='rloss';delta=-(h.bet-Math.floor(h.bet/2));
-      } else if(bust(h.cards)){
-        out='BUST 💥';css='rloss';delta=-h.bet;
-      } else if(bj(h.cards)&&!h.fromSpl&&dBJ){
-        out='PUSH (Both BJ)';css='rpush';delta=0;p.bal+=h.bet;
-      } else if(bj(h.cards)&&!h.fromSpl){
-        out='BLACKJACK ⭐';css='rbj';delta=Math.floor(h.bet*1.5);p.bal+=h.bet+delta;
-      } else if(dBJ){
-        out='DEALER BLACKJACK';css='rloss';delta=-h.bet;
-      } else if(dBust){
-        out='WIN — Dealer Bust';css='rwin';delta=h.bet;p.bal+=h.bet*2;
-      } else if(pv>dv){
-        out='WIN';css='rwin';delta=h.bet;p.bal+=h.bet*2;
-      } else if(pv===dv){
-        out='PUSH';css='rpush';delta=0;p.bal+=h.bet;
-      } else {
-        out='LOSS';css='rloss';delta=-h.bet;
-      }
-      let insNote='';
-      if(hi===0&&p.insBet>0){
-        if(dBJ){p.bal+=p.insBet*3;insNote=` | Insurance: +${p.insBet*2}`;}
-        else insNote=` | Insurance: -${p.insBet}`;
-        p.insBet=0;
-      }
-      html+=`<div class="ri">
-        <div class="rname">${p.name}${lbl} <span style="color:rgba(255,255,255,.4);font-size:.72rem">🪙${p.bal}</span></div>
-        <div class="rinfo">${h.cards.map(c=>c.r+c.s).join(' ')} = ${pv}${insNote}</div>
-        <div class="rpay ${css}">${out} &nbsp; ${delta>=0?'+':''}${delta} chips</div>
-      </div>`;
+// Анти-бот таймер
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+        // Пользователь ушёл — подозрительно
+        console.log('⚠️ User left the app');
     }
-  }
-  const broke=G.players.filter(p=>p.bal<5);
-  if(broke.length) html+=`<div style="text-align:center;color:#e74c3c;font-size:.78rem;margin-top:8px;padding:8px;background:rgba(231,76,60,.1);border-radius:8px">💸 ${broke.map(p=>p.name).join(', ')} ran out of chips!</div>`;
-  document.getElementById('rb').innerHTML=html;
-  document.getElementById('ro').classList.add('on');
-}
-function nextRound(){
-  document.getElementById('ro').classList.remove('on');
-  G.players=G.players.filter(p=>p.bal>=5);
-  if(!G.players.length){showMsg('Game Over!','All players are out of chips.',newGame);return;}
-  startBetting();
-}
-function newGame(){
-  document.getElementById('ro').classList.remove('on');
-  showScreen('ss');
-}
-
-// ── RENDER ──
-function render(){renderPB();renderDA();renderPA();renderAA();}
-
-function renderPB(){
-  const e=document.getElementById('pbar');
-  const m={
-    betting:`<b>PLACE YOUR BETS</b> — Player ${G.betIdx+1} of ${G.players.length}`,
-    insurance:`<b>INSURANCE</b> — Dealer shows an Ace`,
-    playing:`<b>PLAYING</b>`,
-    dealer:`<b>DEALER'S TURN</b>`,
-    results:`<b>ROUND COMPLETE</b>`
-  };
-  e.innerHTML=m[G.phase]||'♠ BLACKJACK 21';
-}
-
-function renderDA(){
-  const ce=document.getElementById('dc'), se=document.getElementById('dsc');
-  if(!G.dealer.cards.length){
-    ce.innerHTML='<span style="color:rgba(255,255,255,.2);font-size:.72rem">Waiting for bets...</span>';
-    se.innerHTML=''; return;
-  }
-  ce.innerHTML=G.dealer.cards.map(c=>mkCard(c)).join('');
-  if(G.dealer.cards[1]?.fd){
-    se.innerHTML=cv(G.dealer.cards[0])+' + ?';
-  } else {
-    const v=hv(G.dealer.cards);
-    se.innerHTML=v+(bj(G.dealer.cards)?' ⭐ BJ':bust(G.dealer.cards)?' 💥 BUST':'');
-  }
-}
-
-function mkCard(c,sm=false){
-  const cls=sm?'card csm':'card';
-  if(!c||c.fd) return `<div class="${cls} fd"></div>`;
-  const r=isRed(c.s);
-  return `<div class="${cls} ${r?'r':'bk'}"><div class="ct">${c.r}<br>${c.s}</div><div class="cm">${c.s}</div><div class="cb">${c.r}</div></div>`;
-}
-
-function renderPA(){
-  const pa=document.getElementById('pa');
-  pa.className=G.players.length===1?'s1':'';
-
-  if(G.phase==='betting'){
-    pa.innerHTML=G.players.map((p,i)=>{
-      const cur=i===G.betIdx;
-      return `<div class="seat ${cur?'on':''}">
-        <div class="sn"><span>${p.name}</span><span class="sb">🪙${p.bal}</span></div>
-        ${cur?`<div style="font-size:.68rem;color:#d4af37;margin-top:2px">Placing bet...</div>`
-             :p._bet?`<div style="font-size:.72rem;color:#2ecc71;margin-top:2px">✓ Bet: ${p._bet}</div>`:''}
-      </div>`;
-    }).join(''); return;
-  }
-
-  pa.innerHTML=G.players.map((p,pi)=>{
-    const on=G.phase==='playing'&&pi===G.curP;
-    let hs='';
-    for(let hi=0;hi<p.hands.length;hi++){
-      const h=p.hands[hi], v=hv(h.cards);
-      const bjH=bj(h.cards)&&!h.fromSpl;
-      hs+=(hi>0?'<div class="hsep"></div>':'')+
-        `<div class="crow">${h.cards.map(c=>mkCard(c,true)).join('')}</div>
-         <div class="sv ${bust(h.cards)?'bust':bjH?'bjv':''}">${bust(h.cards)?'BUST':bjH?'BLACKJACK':h.surr?'SURR':v}</div>
-         <div class="sbet">Bet: ${h.bet}${h.dbl?' ×2':''}</div>`;
-    }
-    return `<div class="seat ${on?'on':''}"><div class="sn"><span>${p.name}</span><span class="sb">🪙${p.bal}</span></div>${hs}</div>`;
-  }).join('');
-}
-
-function renderAA(){
-  const el=document.getElementById('aa');
-
-  if(G.phase==='betting'){
-    const p=G.players[G.betIdx];
-    el.innerHTML=`<div class="bwrap">
-      <div class="bwho">${p.name}'s Bet</div>
-      <div class="bbal">Balance: 🪙 ${p.bal}</div>
-      <div class="bamt">🪙 ${p.tmpBet}</div>
-      <div class="chips">
-        ${[5,10,25,50,100].map(v=>`<button class="chip ch${v}" onclick="addChip(${v})">${v}</button>`).join('')}
-      </div>
-      <div class="bacts">
-        <button class="bcl" onclick="clearBet()">✕ Clear</button>
-        <button class="bco" onclick="confirmBet()">Confirm ✓</button>
-      </div></div>`; return;
-  }
-
-  if(G.phase==='insurance'){
-    const p=G.players[G.insIdx], ib=Math.floor(p.hands[0].bet/2);
-    el.innerHTML=`<div class="inswrap">
-      <div class="inswho">${p.name} — Take Insurance?</div>
-      <div class="insdesc">Dealer shows Ace. Bet ${ib} chips?<br>Pays 2:1 if dealer has Blackjack.</div>
-      <div class="insbtns">
-        <button class="insyes" onclick="insDecide(true)" ${p.bal<ib?'disabled':''}>✓ Yes (${ib} chips)</button>
-        <button class="insno" onclick="insDecide(false)">✕ No</button>
-      </div></div>`; return;
-  }
-
-  if(G.phase==='playing'){
-    const p=G.players[G.curP]; if(!p) return;
-    const h=p.hands[G.curH]; if(!h) return;
-    const v=hv(h.cards), first=h.cards.length===2;
-    const cDbl=first&&p.bal>=h.bet;
-    const cSpl=first&&canSplit(h)&&p.bal>=h.bet&&p.hands.length<4;
-    el.innerHTML=`
-      <div class="atit">🎯 <b>${p.name}</b> — Hand: ${v}${p.hands.length>1?` (Hand ${G.curH+1}/${p.hands.length})`:''}</div>
-      <div class="abtns">
-        <button class="ab ahit" onclick="doHit()">Hit</button>
-        <button class="ab astand" onclick="doStand()">Stand</button>
-        <button class="ab adbl" onclick="doDbl()" ${!cDbl?'disabled':''}>Double Down</button>
-        <button class="ab aspl" onclick="doSpl()" ${!cSpl?'disabled':''}>Split</button>
-        <button class="ab asurr full" onclick="doSurr()" ${!first?'disabled':''}>Surrender — receive 50% back</button>
-      </div>`; return;
-  }
-
-  if(G.phase==='dealer'){el.innerHTML='<div class="dealer-turn">🎰 DEALER IS PLAYING...</div>';return;}
-  el.innerHTML='';
-}
-
-// ── MSG ──
-let msgCB=null;
-function showMsg(t,b,cb){
-  document.getElementById('mt').textContent=t;
-  document.getElementById('mb').textContent=b||'';
-  document.getElementById('mo').classList.add('on');
-  msgCB=cb||null;
-}
-function closeMsg(){
-  document.getElementById('mo').classList.remove('on');
-  if(msgCB){msgCB();msgCB=null;}
-}
-
-// ── INIT ──
-setPC(2); renderNames();
-
-// Force repaint for Telegram WebView
-window.addEventListener('load', () => {
-    document.body.style.display = 'none';
-    document.body.offsetHeight;
-    document.body.style.display = '';
-    console.log('Game fully loaded');
 });
 </script>
 </body>
