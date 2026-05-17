@@ -214,8 +214,11 @@ body{background:#0a1a0a;font-family:Georgia,serif;color:#fff;min-height:100dvh;w
 // ═══════════════════ КОНФИГ ═══════════════════
 const API_URL = 'https://blackjack-server-x391.onrender.com/api/player';
 let tgUser = null;
-let myUserId = 'guest_' + Date.now();
-
+let myUserId = localStorage.getItem('bj_userId');
+if (!myUserId) {
+  myUserId = 'user_' + Math.random().toString(36).substring(2, 10);
+  localStorage.setItem('bj_userId', myUserId);
+}
 // ═══════════════════ TELEGRAM ═══════════════════
 function initTG() {
   if (!window.Telegram?.WebApp) return;
@@ -231,14 +234,17 @@ function initTG() {
 // ═══════════════════ API ═══════════════════
 async function api(action, data = {}) {
   try {
+    console.log('API запрос:', action, myUserId);
     const res = await fetch(API_URL, {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({ action, userId: myUserId, data })
     });
-    return await res.json();
+    const result = await res.json();
+    console.log('API ответ:', result);
+    return result;
   } catch(e) {
-    console.error('API error:', e);
+    console.error('API ошибка:', e.message);
     return null;
   }
 }
@@ -606,17 +612,18 @@ async function endRound() {
 }
 
 async function saveGameResult(result, bj = false) {
+  console.log('💾 Сохраняю игру:', result, 'баланс:', game.balance);
   const p = await api('recordGame', {
-    result, blackjack: bj,
-    balance: game.balance,
-    newAchievements: []
+    result: result, 
+    blackjack: bj,
+    balance: game.balance
   });
+  console.log('💾 Сохранено:', p);
   if (p && p.achievements) {
-    // Проверяем новые достижения
-    const oldAch = JSON.parse(localStorage.getItem('achievements') || '[]');
+    const oldAch = JSON.parse(localStorage.getItem('bj_achievements') || '[]');
     const newAch = p.achievements.filter(a => !oldAch.includes(a));
     newAch.forEach(a => showAchievement(a));
-    localStorage.setItem('achievements', JSON.stringify(p.achievements));
+    localStorage.setItem('bj_achievements', JSON.stringify(p.achievements));
   }
 }
 
