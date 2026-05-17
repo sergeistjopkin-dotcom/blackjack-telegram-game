@@ -13,7 +13,7 @@ body{background:#0b3318;font-family:Georgia,serif;color:#fff;height:100dvh;width
 .screen.active{display:flex}
 
 /* Статус бар */
-#status-bar{position:fixed;top:0;left:0;right:0;z-index:9999;padding:5px;text-align:center;font-size:.6rem;letter-spacing:1px;background:rgba(0,0,0,.9)}
+#status-bar{position:fixed;top:0;left:0;right:0;z-index:9999;padding:4px;text-align:center;font-size:.6rem;letter-spacing:1px;background:rgba(0,0,0,.9)}
 #status-bar.online{background:#27ae60}#status-bar.offline{background:#e74c3c}#status-bar.connecting{background:#f39c12}
 
 /* Главный экран */
@@ -72,7 +72,7 @@ body{background:#0b3318;font-family:Georgia,serif;color:#fff;height:100dvh;width
     <input id="playerName" class="inp" placeholder="Введите имя" maxlength="12">
     
     <!-- Кнопка быстрой игры одному -->
-    <button class="btn-gold" onclick="playSolo()" style="margin-top:5px;">
+    <button class="btn-gold" onclick="playSolo()">
       🤖 ИГРАТЬ ОДНОМУ (против дилера)
     </button>
     
@@ -201,43 +201,55 @@ function connect(){
 }
 
 // ═══════════════════════════════════════
-// РЕЖИМЫ ИГРЫ
+// ИГРА ОДНОМУ (СОЛО)
 // ═══════════════════════════════════════
-
-// Игра одному (против дилера)
 function playSolo(){
   const name=document.getElementById('playerName').value.trim();
   if(!name){toast('⚠️ Введите имя!');return;}
-  toast('🃏 Загрузка игры...');
   
-  // Сохраняем имя и запускаем соло-режим
-  localStorage.setItem('bj_playerName', name);
-  localStorage.setItem('bj_mode', 'solo');
+  localStorage.setItem('bj_playerName',name);
+  localStorage.setItem('bj_mode','solo');
   
-  // Перенаправляем на игру
-  setTimeout(()=>{
-    window.location.href = 'game.html'; // Или показываем встроенную игру
-  }, 500);
+  toast('🃏 Запуск соло-игры...');
+  
+  document.getElementById('homeContent').innerHTML=`
+    <div style="text-align:center;">
+      <div style="font-size:3rem;margin-bottom:10px;">🃏</div>
+      <h2 style="color:#d4af37;">СОЛО-ИГРА</h2>
+      <p style="color:rgba(255,255,255,.7);">Игрок: <b>${name}</b></p>
+      <p style="color:rgba(255,255,255,.5);font-size:.8rem;margin-top:15px;">
+        🎯 Режим в разработке<br>
+        Скоро здесь будет полноценная игра против дилера!
+      </p>
+      <p style="color:rgba(255,255,255,.3);font-size:.7rem;margin-top:10px;">
+        А пока играйте с друзьями в мультиплеере
+      </p>
+      <button class="btn-gold" onclick="location.reload()" style="margin-top:20px;">🔙 НАЗАД</button>
+    </div>
+  `;
 }
 
-// Игра с друзьями
+// ═══════════════════════════════════════
+// ИГРА С ДРУЗЬЯМИ
+// ═══════════════════════════════════════
 function joinGame(){
   const name=document.getElementById('playerName').value.trim();
   if(!name){toast('⚠️ Введите имя!');return;}
   const rc=document.getElementById('roomCode').value.trim().toUpperCase();
   if(!ws||ws.readyState!==WebSocket.OPEN){toast('⚠️ Нет подключения к серверу');return;}
   
-  localStorage.setItem('bj_playerName', name);
-  localStorage.setItem('bj_mode', 'multi');
+  localStorage.setItem('bj_playerName',name);
+  localStorage.setItem('bj_mode','multi');
   
   if(rc){
     ws.send(JSON.stringify({type:'join_room',roomId:rc,username:name}));
-  } else {
+  }else{
     const nr='R'+Math.random().toString(36).substring(2,6).toUpperCase();
     ws.send(JSON.stringify({type:'create_room',roomId:nr,username:name}));
   }
   document.getElementById('btnPlay').style.display='none';
   document.querySelector('.divider').style.display='none';
+  document.querySelector('#homeContent .btn-gold:first-of-type').style.display='none';
 }
 
 function showRoom(m){
@@ -245,24 +257,24 @@ function showRoom(m){
   document.getElementById('roomIdDisplay').textContent=m.roomId;
   if(m.players)updatePlayers(m.players);
 }
-
 function updatePlayers(pl){
   document.getElementById('playersList').innerHTML=pl.map(p=>`<span class="player-tag${p.id===myId?' me':''}">${p.username}${p.id===myId?' (Вы)':''}</span>`).join('');
   document.getElementById('waitingMsg').textContent=pl.length>=2?'Можно начинать игру!':'Ожидание игроков...';
 }
-
 function shareRoom(){
-  const t=encodeURIComponent('🎰 Играю в Блэкджек 21!\n🏠 Код комнаты: '+room+'\n▶️ Присоединяйся: https://t.me/Blackjack21CasinoBot');
-  if(window.Telegram?.WebApp)window.Telegram.WebApp.openTelegramLink('https://t.me/share/url?url=https://t.me/Blackjack21CasinoBot&text='+t);
+  const t=encodeURIComponent('🎰 Играю в Блэкджек 21!\n🏠 Код: '+room+'\n▶️ Присоединяйся!');
+  if(window.Telegram?.WebApp)window.Telegram.WebApp.openTelegramLink('https://t.me/share/url?url=&text='+t);
   else{navigator.clipboard.writeText(room);toast('📋 Код скопирован: '+room);}
 }
-
 function startMultiGame(){
   if(!ws||ws.readyState!==WebSocket.OPEN){toast('⚠️ Нет подключения');return;}
   ws.send(JSON.stringify({type:'start_game',roomId:room}));
   toast('🃏 Игра начинается!');
 }
 
+// ═══════════════════════════════════════
+// ВСПОМОГАТЕЛЬНЫЕ
+// ═══════════════════════════════════════
 function toast(t){const el=document.getElementById('toast');el.textContent=t;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2000);}
 
 // ═══════════════════════════════════════
