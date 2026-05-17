@@ -104,7 +104,9 @@ body{background:#0a1a0a;font-family:Georgia,serif;color:#fff;min-height:100dvh;w
 .toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.9);color:#fff;padding:12px 25px;border-radius:25px;font-size:.8rem;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none}
 .toast.show{opacity:1}
   
-  /* Улучшенная анимация карт */
+ .toast.show{opacity:1}
+
+/* Улучшенная анимация карт */
 .card{transition:transform 0.3s ease,opacity 0.3s ease}
 .card:hover{transform:translateY(-3px);box-shadow:0 6px 15px rgba(0,0,0,.6)}
 .card.fly{animation:flyFromDeck .4s cubic-bezier(.25,.46,.45,.94)}
@@ -121,6 +123,7 @@ body{background:#0a1a0a;font-family:Georgia,serif;color:#fff;min-height:100dvh;w
 .btn-act:not(:disabled):hover{filter:brightness(1.2)}
 .msg-banner{animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.7}}
+</style>
 </style>
 </head>
 <body>
