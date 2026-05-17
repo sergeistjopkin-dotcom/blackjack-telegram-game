@@ -656,7 +656,65 @@ async function startSoloGame() {
 }
 
 function joinMultiGame() {
-  toast('👥 Мультиплеер скоро!');
+  const name = document.getElementById('playerName').value.trim();
+  if (!name) return toast('⚠️ Введите имя!');
+  
+  const roomCode = document.getElementById('roomCode').value.trim().toUpperCase();
+  if (!roomCode) return toast('⚠️ Введите код комнаты!');
+  
+  toast('🔗 Подключение...');
+  
+  try {
+    multiWS = new WebSocket('wss://blackjack-server-x391.onrender.com');
+    
+    multiWS.onopen = () => {
+      toast('✅ Подключено!');
+      multiWS.send(JSON.stringify({
+        type: 'join_multi',
+        userId: myUserId,
+        roomId: roomCode,
+        username: name
+      }));
+    };
+    
+    multiWS.onmessage = (event) => {
+      const msg = JSON.parse(event.data);
+      toast('📨 ' + msg.type);
+      
+      if (msg.type === 'joined_room') {
+        document.getElementById('homeContent').innerHTML = `
+          <div style="text-align:center;padding:15px;">
+            <h3 style="color:#d4af37;">🏠 КОМНАТА: ${msg.roomId}</h3>
+            <p>Игроков: ${msg.players.length}</p>
+            ${msg.players.map(p => `<span class="player-tag">${p.username}</span>`).join(' ')}
+            <br><br>
+            <button class="btn-gold" onclick="leaveMultiRoom()">🚪 ВЫЙТИ</button>
+          </div>`;
+      }
+      
+      if (msg.type === 'room_update') {
+        toast('🔄 Обновление комнаты');
+      }
+      
+      if (msg.type === 'error') {
+        toast('❌ ' + msg.message);
+      }
+    };
+    
+    multiWS.onerror = () => toast('❌ Ошибка WebSocket');
+    multiWS.onclose = () => toast('🔌 Соединение закрыто');
+    
+  } catch(e) {
+    toast('❌ ' + e.message);
+  }
+}
+
+function leaveMultiRoom() {
+  if (multiWS) {
+    multiWS.send(JSON.stringify({ type: 'leave_room' }));
+    multiWS.close();
+  }
+  goHome();
 }
 // ═══════════════════ КВИЗ ═══════════════════
 const quizQuestions = [
