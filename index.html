@@ -300,10 +300,21 @@ async function claimDaily() {
 }
 
 function switchTab(tab) {
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  // Скрываем все вкладки
   document.querySelectorAll('[id^="tab-"]').forEach(t => t.style.display = 'none');
-  document.getElementById('tab-' + tab).style.display = 'block';
-  event.target.classList.add('active');
+  // Показываем нужную
+  const target = document.getElementById('tab-' + tab);
+  if (target) target.style.display = 'block';
+  
+  // Обновляем кнопки табов
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    b.classList.remove('active');
+    if (b.textContent.includes(tab === 'play' ? 'Игра' : tab === 'leaderboard' ? 'Топ' : 'Ачивки')) {
+      b.classList.add('active');
+    }
+  });
+  
+  // Загружаем данные
   if (tab === 'leaderboard') loadLeaderboard();
   if (tab === 'achievements') { loadAchievements(); loadStats(); }
 }
