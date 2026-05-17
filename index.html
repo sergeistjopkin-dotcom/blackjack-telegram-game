@@ -5,6 +5,170 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="format-detection" content="telephone=no">
 <title>♠ Blackjack 21</title>
+  // ═══════════════════════════════════════
+// ПОДКЛЮЧЕНИЕ К СЕРВЕРУ
+// ═══════════════════════════════════════
+const SERVER_URL = 'https://blackjack-server-yg3n.onrender.com'; // ЗАМЕНИ НА СВОЙ URL
+
+let ws = null;
+let myPlayerId = null;
+let currentRoom = null;
+let gameState = null;
+
+// Инициализация Telegram
+const tg = window.Telegram?.WebApp;
+if (tg) {
+    tg.ready();
+    tg.expand();
+}
+
+// Защита от ботов
+function verifyUser() {
+    if (!tg || !tg.initDataUnsafe?.user) {
+        document.body.innerHTML = `
+            <div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#0b3318;color:white;text-align:center;font-family:Georgia,serif;">
+                <div>
+                    <h1 style="color:#d4af37;">🔒 ДОСТУП ЗАПРЕЩЁН</h1>
+                    <p>Откройте игру через Telegram Mini App</p>
+                    <p style="color:rgba(255,255,255,.5);font-size:.8rem;margin-top:10px;">
+                        @Blackjack21Bot
+                    </p>
+                </div>
+            </div>`;
+        return false;
+    }
+    
+    window.telegramUser = {
+        id: tg.initDataUnsafe.user.id.toString(),
+        username: tg.initDataUnsafe.user.username || tg.initDataUnsafe.user.first_name || 'Player',
+        firstName: tg.initDataUnsafe.user.first_name || 'Guest',
+    };
+    
+    return true;
+}
+
+// Подключение к серверу
+function connectToServer() {
+    if (!verifyUser()) return;
+    
+    ws = new WebSocket(SERVER_URL);
+    
+    ws.onopen = () => {
+        console.log('✅ Connected to server');
+        
+        // Авторизуемся
+        ws.send(JSON.stringify({
+            type: 'auth',
+            telegramId: window.telegramUser.id,
+            username: window.telegramUser.username,
+        }));
+        
+        // Показываем экран верификации
+        showVerificationScreen();
+    };
+    
+    ws.onmessage = (event) => {
+        const msg = JSON.parse(event.data);
+        handleServerMessage(msg);
+    };
+    
+    ws.onclose = () => {
+        console.log('❌ Disconnected from server');
+        // Пытаемся переподключиться через 5 секунд
+        setTimeout(connectToServer, 5000);
+    };
+    
+    ws.onerror = (error) => {
+        console.error('WebSocket error:', error);
+    };
+}
+
+// Экран верификации (защита от ботов)
+function showVerificationScreen() {
+    const verifyHTML = `
+    <div id="verifyScreen" style="display:flex;align-items:center;justify-content:center;height:100vh;background:radial-gradient(ellipse at 50% 25%,#1e7a38 0%,#0b3318 65%);font-family:Georgia,serif;color:white;text-align:center;padding:20px;position:fixed;inset:0;z-index:999;">
+        <div>
+            <h1 style="color:#d4af37;font-size:2rem;margin-bottom:20px;">🃏 BLACKJACK 21</h1>
+            <div style="background:rgba(0,0,0,.35);border:1px solid rgba(212,175,55,.2);border-radius:16px;padding:30px;max-width:350px;">
+                <p style="font-size:1.2rem;color:#d4af37;margin-bottom:10px;">
+                    👋 Привет, ${window.telegramUser?.firstName || 'Игрок'}!
+                </p>
+                <p style="font-size:.9rem;color:rgba(255,255,255,.7);margin-bottom:20px;">
+                    Нажми кнопку чтобы начать игру
+                </p>
+                <button onclick="startGame()" style="padding:15px 40px;background:linear-gradient(135deg,#b8891e,#e8c93a);color:black;border:none;border-radius:12px;font-size:1.1rem;font-weight:bold;cursor:pointer;letter-spacing:2px;box-shadow:0 4px 20px rgba(212,175,55,.3);">
+                    ✅ Я ЧЕЛОВЕК — ИГРАТЬ!
+                </button>
+                <p style="font-size:.65rem;color:rgba(255,255,255,.3);margin-top:15px;">
+                    Баланс: 🪙 ${getBalance()} | Защита от ботов
+                </p>
+            </div>
+        </div>
+    </div>`;
+    
+    document.body.insertAdjacentHTML('beforeend', verifyHTML);
+}
+
+function startGame() {
+    document.getElementById('verifyScreen')?.remove();
+    
+    // Создаём комнату
+    const roomId = getRoomFromURL() || generateRoomId();
+    
+    ws.send(JSON.stringify({
+        type: 'create_room',
+        roomId: roomId,
+        username: window.telegramUser.username,
+    }));
+    
+    // Показываем основной экран игры
+    document.getElementById('ss').classList.add('active');
+}
+
+function getRoomFromURL() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('room');
+}
+
+function generateRoomId() {
+    return Math.random().toString(36).substring(2, 8).toUpperCase();
+}
+
+function getBalance() {
+    return localStorage.getItem('blackjack_balance') || '1000';
+}
+
+// Обработка сообщений от сервера
+function handleServerMessage(msg) {
+    switch (msg.type) {
+        case 'auth_ok':
+            myPlayerId = msg.playerId;
+            localStorage.setItem('blackjack_player_id', myPlayerId);
+            localStorage.setItem('blackjack_balance', msg.balance);
+            break;
+            
+        case 'room_created':
+            currentRoom = msg.roomId;
+            console.log('🎰 Room created:', currentRoom);
+            console.log('📨 Invite link:', msg.inviteLink);
+            break;
+            
+        case 'player_hit':
+            updatePlayerCards(msg.playerId, msg.card, msg.value);
+            break;
+            
+        case 'player_stand':
+            showPlayerStatus(msg.playerId, '✋ Stand');
+            break;
+            
+        // ... добавь другие обработчики
+    }
+}
+
+// Запускаем подключение при загрузке
+window.addEventListener('DOMContentLoaded', () => {
+    connectToServer();
+});
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
