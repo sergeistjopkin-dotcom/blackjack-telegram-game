@@ -1,15 +1,16 @@
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="format-detection" content="telephone=no">
 <title>♠ Blackjack 21</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{background:#0b3318;font-family:Georgia,serif;color:#fff;height:100dvh;overflow:hidden}
-.screen{display:none;height:100dvh;flex-direction:column}
+html,body{width:100%;height:100%;overflow:hidden;position:fixed;top:0;left:0}
+body{background:#0b3318;font-family:Georgia,serif;color:#fff;height:100dvh;width:100vw}
+.screen{display:none;height:100dvh;width:100vw;flex-direction:column;position:absolute;top:0;left:0}
 .screen.active{display:flex}
 
 /* ── SETUP ── */
@@ -174,9 +175,66 @@ body{background:#0b3318;font-family:Georgia,serif;color:#fff;height:100dvh;overf
   <button class="mok" onclick="closeMsg()">OK</button>
 </div></div>
 
+<!-- DEBUG (Shows if Telegram detected) -->
+<div id="debugInfo" style="position:fixed;bottom:0;left:0;right:0;background:rgba(0,0,0,.8);color:#fff;font-size:10px;padding:4px;text-align:center;z-index:999;display:none;"></div>
+
 <script>
-const tg = window.Telegram?.WebApp;
-if (tg){tg.ready();tg.expand();tg.disableVerticalSwipes?.();}
+// ═══════════════════════════════════════
+// TELEGRAM INITIALIZATION — THIS IS THE FIX
+// ═══════════════════════════════════════
+(function initTelegram() {
+    const debug = document.getElementById('debugInfo');
+    
+    try {
+        if (window.Telegram && window.Telegram.WebApp) {
+            const tg = window.Telegram.WebApp;
+            tg.ready();
+            tg.expand();
+            
+            // Match Telegram theme
+            if (tg.themeParams) {
+                if (tg.themeParams.secondary_bg_color) {
+                    document.body.style.backgroundColor = tg.themeParams.secondary_bg_color;
+                }
+                if (tg.themeParams.text_color) {
+                    document.body.style.color = tg.themeParams.text_color;
+                }
+            }
+            
+            // Show success briefly
+            debug.style.display = 'block';
+            debug.textContent = '✅ Telegram WebApp Ready | Platform: ' + (tg.platform || 'unknown');
+            debug.style.color = '#4caf50';
+            
+            setTimeout(() => {
+                debug.style.display = 'none';
+            }, 2000);
+            
+            console.log('Telegram WebApp initialized successfully');
+        } else {
+            // Running in browser
+            debug.style.display = 'block';
+            debug.textContent = '⚠️ Running in Browser Mode';
+            debug.style.color = '#ff9800';
+            
+            setTimeout(() => {
+                debug.style.display = 'none';
+            }, 3000);
+            
+            console.log('Not running in Telegram WebApp');
+        }
+    } catch (error) {
+        debug.style.display = 'block';
+        debug.textContent = '❌ Error: ' + error.message;
+        debug.style.color = '#f44336';
+        
+        console.error('Telegram initialization error:', error);
+    }
+})();
+
+// ═══════════════════════════════════════
+// YOUR ORIGINAL GAME CODE (unchanged)
+// ═══════════════════════════════════════
 
 // ── CONFIG ──
 let cfg = {pc:2, bal:1000};
@@ -324,9 +382,9 @@ function advance(){
     const p=G.players[G.curP];
     const h=p.hands[G.curH];
     if(!h){G.curP++;G.curH=0;continue;}
-    if(bj(h.cards)&&!h.fromSpl){skip();continue;}   // Natural BJ auto-stands
-    if(hv(h.cards)===21){skip();continue;}            // 21 auto-stands
-    if(h.fromSpl&&h.cards[0]?.r==='A'&&h.cards.length>=2){skip();continue;} // Split aces 1 card
+    if(bj(h.cards)&&!h.fromSpl){skip();continue;}
+    if(hv(h.cards)===21){skip();continue;}
+    if(h.fromSpl&&h.cards[0]?.r==='A'&&h.cards.length>=2){skip();continue;}
     break;
   }
   if(G.curP>=G.players.length) dealerTurn();
@@ -420,7 +478,6 @@ function showResults(){
       } else {
         out='LOSS';css='rloss';delta=-h.bet;
       }
-      // Insurance settle (first hand only)
       let insNote='';
       if(hi===0&&p.insBet>0){
         if(dBJ){p.bal+=p.insBet*3;insNote=` | Insurance: +${p.insBet*2}`;}
@@ -582,6 +639,14 @@ function closeMsg(){
 
 // ── INIT ──
 setPC(2); renderNames();
+
+// Force repaint for Telegram WebView
+window.addEventListener('load', () => {
+    document.body.style.display = 'none';
+    document.body.offsetHeight;
+    document.body.style.display = '';
+    console.log('Game fully loaded');
+});
 </script>
 </body>
 </html>
