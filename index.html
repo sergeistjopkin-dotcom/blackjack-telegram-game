@@ -79,7 +79,7 @@ body{background:#0b3318;font-family:Georgia,serif;color:#fff;height:100dvh;width
 // ============================================
 // КОНФИГУРАЦИЯ
 // ============================================
-const SERVER_URL = 'wss://blackjack-server.onrender.com'; // ТВОЙ URL
+const SERVER_URL = 'https://blackjack-server-x391.onrender.com'; // ТВОЙ URL
 
 // ============================================
 // ЗАЩИТА ОТ БОТОВ
@@ -280,10 +280,10 @@ function shareRoom() {
     const shareText = encodeURIComponent(
         '🎰 Играю в Блэкджек 21!\n' +
         'Код комнаты: ' + currentRoom + '\n' +
-        'Присоединяйся: https://t.me/ВАШ_БОТ?start=' + currentRoom
+        'Присоединяйся: https://t.me/@Gem_analitics_bot?start=' + currentRoom
     );
     
-    const shareURL = 'https://t.me/share/url?url=https://t.me/ВАШ_БОТ&text=' + shareText;
+    const shareURL = 'https://t.me/share/url?url=https://t.me/@Gem_analitics_bot&text=' + shareText;
     
     if (window.Telegram?.WebApp) {
         window.Telegram.WebApp.openTelegramLink(shareURL);
