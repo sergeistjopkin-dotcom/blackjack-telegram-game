@@ -214,45 +214,23 @@ function stand(){
     return;
   }
   game.phase='dealer';renderGame();game.dealerHand.push(game.dealerHole);game.dealerHole=null;
-  setTimeout(()=>{renderGame();const dc=document.querySelectorAll('#dealerCards .card');if(dc.length>0){const hc=dc[dc.length-1];if(hc){hc.style.animation='flyFromDeck 0.5s ease-out';}}},300);
+  setTimeout(()=>{renderGame();},300);
   setTimeout(()=>{while(hv(game.dealerHand)<17){game.dealerHand.push(draw());renderGame();}endRound();},1000);
 }
 
 function doubleDown(){if(game.balance<game.bet)return;game.balance-=game.bet;game.bet*=2;game.playerHand.push(draw());showAchievement('double_down');stand();}
 
-function split(){
-  if(game.playerHand.length!==2)return;
-  if(game.balance<game.bet)return toast('⚠️ Недостаточно фишек');
-  if(cv(game.playerHand[0])!==cv(game.playerHand[1]))return;
-  const card2=game.playerHand.pop();
-  game.balance-=game.bet;
-  game.playerHand.push(draw());
-  game.splitHand=[card2,draw()];
-  game.splitBet=game.bet;
-  game.isSplit=true;
-  toast('🔀 Карты разделены!');
-  renderGame();
-}
+function split(){if(game.playerHand.length!==2)return;if(game.balance<game.bet)return toast('⚠️ Недостаточно фишек');if(cv(game.playerHand[0])!==cv(game.playerHand[1]))return;const card2=game.playerHand.pop();game.balance-=game.bet;game.playerHand.push(draw());game.splitHand=[card2,draw()];game.splitBet=game.bet;game.isSplit=true;toast('🔀 Карты разделены!');renderGame();}
 
 function surrender(){const back=Math.floor(game.bet/2);game.balance+=back;game.bet=0;game.lastResult='surrender';game.phase='result';saveGameResult();renderGame();}
 
 async function endRound(){
-  game.phase='result';
-  const pv=hv(game.playerHand),dv=hv(game.dealerHand);
-  let result='loss',bj=false;
-  if(pv>21)result='loss';
-  else if(dv>21||pv>dv){result='win';game.balance+=game.bet*2;}
-  else if(pv===dv){result='push';game.balance+=game.bet;}
+  game.phase='result';const pv=hv(game.playerHand),dv=hv(game.dealerHand);let result='loss',bj=false;
+  if(pv>21)result='loss';else if(dv>21||pv>dv){result='win';game.balance+=game.bet*2;}else if(pv===dv){result='push';game.balance+=game.bet;}
   if(isBJ(game.playerHand)&&pv===21){bj=true;game.balance+=Math.floor(game.bet*0.5);showAchievement('blackjack');}
   if(game.insuranceBet>0&&isBJ(game.dealerHand)){game.balance+=game.insuranceBet*3;showAchievement('insurance_win');}
   if(result==='win'&&game.lastResult==='loss')showAchievement('comeback');
-  
-  if(game.isSplit&&game.splitHand){
-    const sv=hv(game.splitHand);
-    if(sv<=21&&(dv>21||sv>dv))game.balance+=game.splitBet*2;
-    else if(sv===dv)game.balance+=game.splitBet;
-  }
-  
+  if(game.isSplit&&game.splitHand){const sv=hv(game.splitHand);if(sv<=21&&(dv>21||sv>dv))game.balance+=game.splitBet*2;else if(sv===dv)game.balance+=game.splitBet;}
   game.lastResult=result;game.bet=0;game.insuranceBet=0;game.isSplit=false;game.splitHand=null;game.splitBet=0;
   await saveGameResult(result,bj);renderGame();
 }
@@ -267,13 +245,53 @@ async function startSoloGame(){const name=document.getElementById('playerName').
 
 function joinMultiGame(){const name=document.getElementById('playerName').value.trim();if(!name)return toast('⚠️ Введите имя!');localStorage.setItem('bj_playerName',name);const roomCode=document.getElementById('roomCode').value.trim().toUpperCase();if(!roomCode){const newRoom='R'+Math.random().toString(36).substring(2,6).toUpperCase();document.getElementById('roomCode').value=newRoom;connectToRoom(newRoom,name);return;}connectToRoom(roomCode,name);}
 
-function connectToRoom(roomCode,name){toast('🔗 Подключение к '+roomCode+'...');try{if(multiWS){multiWS.close();}multiWS=new WebSocket(WS_URL);multiWS.onopen=()=>{multiWS.send(JSON.stringify({type:'join_multi',userId:myUserId,roomId:roomCode,username:name}));};multiWS.onmessage=(event)=>{const msg=JSON.parse(event.data);if(msg.type==='joined_room'){multiRoom=msg.roomId;const isHost=msg.players[0]?.id===myUserId;document.getElementById('homeContent').innerHTML=`<div class="room-box"><div style="font-size:.6rem;color:rgba(255,255,255,.4)">КОД КОМНАТЫ</div><div class="room-code">${msg.roomId}</div><div class="room-players" id="multiPlayers">${msg.players.map(p=>`<span class="player-tag${p.id===myUserId?' me':''}">${p.username}${p.id===myUserId?' (Вы)':''}</span>`).join('')}</div><div class="waiting-text" id="waitingMsg">Игроков: ${msg.players.length}/4</div></div>${isHost?`<button class="btn-gold" onclick="startMultiGame()">🃏 НАЧАТЬ ИГРУ</button>`:`<div class="waiting-text">Ожидание хоста...</div>`}<button class="btn-share" onclick="shareMultiRoom()">📤 ПРИГЛАСИТЬ ДРУЗЕЙ</button><button class="btn-back" onclick="leaveMultiRoom()">🚪 ВЫЙТИ</button>`;}if(msg.type==='room_update'){const playersEl=document.getElementById('multiPlayers');const waitingEl=document.getElementById('waitingMsg');if(playersEl&&msg.players){playersEl.innerHTML=msg.players.map(p=>`<span class="player-tag${p.id===myUserId?' me':''}">${p.username}${p.id===myUserId?' (Вы)':''}</span>`).join('');if(waitingEl)waitingEl.textContent=`Игроков: ${msg.players.length}/4`;const isHost=msg.players[0]?.id===myUserId;const startBtn=document.querySelector('#homeContent .btn-gold');if(startBtn&&isHost)startBtn.textContent=`🃏 НАЧАТЬ ИГРУ (${msg.players.length} игроков)`;}}if(msg.type==='error'){toast('❌ '+msg.message);goHome();}};multiWS.onerror=()=>{toast('❌ Ошибка подключения');goHome();};}catch(e){toast('❌ Ошибка: '+e.message);}}
+function connectToRoom(roomCode,name){
+  toast('🔗 Подключение к '+roomCode+'...');
+  try{
+    if(multiWS){multiWS.close();}
+    multiWS=new WebSocket(WS_URL);
+    multiWS.onopen=()=>{console.log('WS open');multiWS.send(JSON.stringify({type:'join_multi',userId:myUserId,roomId:roomCode,username:name}));};
+    multiWS.onmessage=(event)=>{
+      const msg=JSON.parse(event.data);console.log('WS msg:',msg.type);
+      if(msg.type==='joined_room'){
+        multiRoom=msg.roomId;const isHost=msg.players[0]?.id===myUserId;
+        document.getElementById('homeContent').innerHTML=`<div class="room-box"><div style="font-size:.6rem;color:rgba(255,255,255,.4)">КОД КОМНАТЫ</div><div class="room-code">${msg.roomId}</div><div class="room-players" id="multiPlayers">${msg.players.map(p=>`<span class="player-tag${p.id===myUserId?' me':''}">${p.username}${p.id===myUserId?' (Вы)':''}</span>`).join('')}</div><div class="waiting-text" id="waitingMsg">Игроков: ${msg.players.length}/4</div></div>${isHost?`<button class="btn-gold" onclick="startMultiGame()">🃏 НАЧАТЬ ИГРУ</button>`:`<div class="waiting-text">Ожидание хоста...</div>`}<button class="btn-share" onclick="shareMultiRoom()">📤 ПРИГЛАСИТЬ ДРУЗЕЙ</button><button class="btn-back" onclick="leaveMultiRoom()">🚪 ВЫЙТИ</button>`;
+      }
+      if(msg.type==='room_update'){
+        const playersEl=document.getElementById('multiPlayers');const waitingEl=document.getElementById('waitingMsg');
+        if(playersEl&&msg.players){
+          playersEl.innerHTML=msg.players.map(p=>`<span class="player-tag${p.id===myUserId?' me':''}">${p.username}${p.id===myUserId?' (Вы)':''}</span>`).join('');
+          if(waitingEl)waitingEl.textContent=`Игроков: ${msg.players.length}/4`;
+        }
+      }
+      if(msg.type==='start_game'){
+        toast('🃏 Игра начинается!');
+        document.getElementById('home-screen').classList.remove('active');
+        document.getElementById('game-screen').classList.add('active');
+        game.playerName=localStorage.getItem('bj_playerName')||'Игрок';
+        game.balance=1000;game.phase='betting';renderGame();
+        document.getElementById('gameMsg').textContent='👥 Мультиплеер!';
+      }
+      if(msg.type==='error'){toast('❌ '+msg.message);goHome();}
+    };
+    multiWS.onerror=()=>{toast('❌ Ошибка подключения');goHome();};
+  }catch(e){toast('❌ Ошибка: '+e.message);}
+}
 
 function shareMultiRoom(){if(!multiRoom)return;const text='🎰 BLACKJACK 21\n🏠 Код комнаты: '+multiRoom;if(window.Telegram?.WebApp){window.Telegram.WebApp.openTelegramLink('https://t.me/share/url?text='+encodeURIComponent(text));}else{navigator.clipboard.writeText(multiRoom).then(()=>{toast('📋 Код скопирован: '+multiRoom);});}}
 
 function leaveMultiRoom(){if(multiWS&&multiWS.readyState===WebSocket.OPEN){multiWS.send(JSON.stringify({type:'leave_room'}));multiWS.close();}multiRoom=null;multiWS=null;goHome();document.getElementById('roomCode').value='';}
 
-function startMultiGame(){toast('🃏 Игра начинается!');document.getElementById('home-screen').classList.remove('active');document.getElementById('game-screen').classList.add('active');game.playerName=localStorage.getItem('bj_playerName')||'Игрок';game.balance=1000;game.phase='betting';renderGame();document.getElementById('gameMsg').textContent='👥 Мультиплеер!';}
+function startMultiGame(){
+  if(!multiWS||multiWS.readyState!==WebSocket.OPEN)return toast('⚠️ Нет подключения');
+  multiWS.send(JSON.stringify({type:'start_game',roomId:multiRoom}));
+  toast('🃏 Игра начинается!');
+  document.getElementById('home-screen').classList.remove('active');
+  document.getElementById('game-screen').classList.add('active');
+  game.playerName=localStorage.getItem('bj_playerName')||'Игрок';
+  game.balance=1000;game.phase='betting';renderGame();
+  document.getElementById('gameMsg').textContent='👥 Мультиплеер!';
+}
 
 const quizQuestions=[{q:'🎯 Сколько очков нужно набрать в Блэкджеке для победы?',a:['21','20','18','22'],c:0,diff:'easy'},{q:'🃏 Какая карта может стоить 1 или 11 очков по выбору игрока?',a:['Король','Туз','Дама','Валет'],c:1,diff:'easy'},{q:'🧮 При каком счёте дилер ОБЯЗАН прекратить добирать карты?',a:['Мягкие 18','Твёрдые 16','Твёрдые 17','Мягкие 19'],c:2,diff:'hard'}];
 let qi=0,qok=0;
@@ -288,8 +306,7 @@ function showQuiz(){
     document.getElementById('homeContent').style.display='flex';
     document.getElementById('playerName').value=localStorage.getItem('bj_playerName')||tgUser?.first_name||'';
     loadLeaderboard();loadAchievements();loadStats();
-    toast('👋 С возвращением!');
-    return;
+    toast('👋 С возвращением!');return;
   }
   document.getElementById('home-screen').classList.remove('active');
   document.getElementById('quiz-screen').classList.add('active');
@@ -302,15 +319,8 @@ function quizDone(){
   document.getElementById('home-screen').classList.add('active');
   document.getElementById('homeContent').style.display='flex';
   document.getElementById('playerName').value=localStorage.getItem('bj_playerName')||tgUser?.first_name||'';
-  if(qok>=2){
-    toast('✅ ПРОВЕРКА ПРОЙДЕНА!');
-    localStorage.setItem('bj_quiz_passed','true');
-    localStorage.setItem('bj_quiz_date',new Date().toDateString());
-    loadLeaderboard();loadAchievements();loadStats();
-  }else{
-    toast('❌ ПОПРОБУЙТЕ ЕЩЁ РАЗ');
-    setTimeout(()=>{qi=0;qok=0;showQuiz();},1500);
-  }
+  if(qok>=2){toast('✅ ПРОВЕРКА ПРОЙДЕНА!');localStorage.setItem('bj_quiz_passed','true');localStorage.setItem('bj_quiz_date',new Date().toDateString());loadLeaderboard();loadAchievements();loadStats();}
+  else{toast('❌ ПОПРОБУЙТЕ ЕЩЁ РАЗ');setTimeout(()=>{qi=0;qok=0;showQuiz();},1500);}
 }
 
 function toast(t){const el=document.getElementById('toast');el.textContent=t;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2000);}
