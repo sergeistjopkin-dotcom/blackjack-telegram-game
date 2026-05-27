@@ -200,7 +200,33 @@ function renderGame(){
 function addBet(v){if(game.phase!=='betting')return;if(game.bet+v<=game.balance){game.bet+=v;game.balance-=v;}renderGame();}
 function clearBet(){if(game.phase!=='betting')return;game.balance+=game.bet;game.bet=0;game.insuranceBet=0;renderGame();}
 
-function deal(){if(game.bet<5)return toast('⚠️ Минимум 5 фишек');if(game.bet>=100)showAchievement('high_roller');game.deck=newDeck();game.isSplit=false;game.splitHand=null;game.splitBet=0;game.splitDone=false;game.phase='dealing';document.getElementById('gameMsg').textContent='🃏 Раздача карт...';let step=0;const seq=[];seq.push(()=>{game.playerHand=[draw()];renderGame();});seq.push(()=>{game.dealerHand=[draw()];renderGame();});seq.push(()=>{game.playerHand.push(draw());renderGame();});seq.push(()=>{game.dealerHole=draw();renderGame();});function next(){if(step<seq.length){seq[step]();step++;setTimeout(next,400);}else{if(game.dealerHand[0].v==='A'&&game.balance>=Math.floor(game.bet/2)){game.phase='insurance';}else{game.phase='player';if(hv(game.playerHand)===21)stand();}renderGame();}}next();}
+function deal(){
+  if(game.bet<5)return toast('⚠️ Минимум 5 фишек');
+  if(game.bet>=100)showAchievement('high_roller');
+  
+  // Новая колода ТОЛЬКО если осталось меньше 52 карт (25% от 6 колод)
+  if(!game.deck||game.deck.length<78)game.deck=newDeck();
+  
+  game.isSplit=false;game.splitHand=null;game.splitBet=0;game.splitDone=false;
+  game.phase='dealing';document.getElementById('gameMsg').textContent='🃏 Раздача карт...';
+  
+  let step=0;
+  const seq=[];
+  seq.push(()=>{game.playerHand=[draw()];renderGame();});
+  seq.push(()=>{game.dealerHand=[draw()];renderGame();});
+  seq.push(()=>{game.playerHand.push(draw());renderGame();});
+  seq.push(()=>{game.dealerHole=draw();renderGame();});
+  
+  function next(){
+    if(step<seq.length){seq[step]();step++;setTimeout(next,400);}
+    else{
+      if(game.dealerHand[0].v==='A'&&game.balance>=Math.floor(game.bet/2)){game.phase='insurance';}
+      else{game.phase='player';if(hv(game.playerHand)===21)stand();}
+      renderGame();
+    }
+  }
+  next();
+}
 
 function takeInsurance(yes){if(yes){game.insuranceBet=Math.floor(game.bet/2);game.balance-=game.insuranceBet;}game.phase='player';if(hv(game.playerHand)===21)stand();renderGame();}
 
